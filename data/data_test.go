@@ -33,9 +33,9 @@ func TestDatabase(t *testing.T) {
 	}
 	t.Log("Wrote pognon to database")
 
-	t1 := Transaction{IDPognon: 1,
+	t1 := Transaction{Pognon: &p,
 		Buyers: []Purchase{{"a", 10.25}},
-		Payers: []Purchase{{"a", 5}, {"c", 3}, {"a", 2.25}},
+		For:    []Purchase{{"a", 5}, {"c", 3}, {"a", 2.25}},
 		Reason: "love"}
 	_, err = engine.Insert(t1)
 	if err != nil {
@@ -51,9 +51,9 @@ func TestDatabase(t *testing.T) {
 	json, _ := json.MarshalIndent(&value, "", "\t")
 	os.Stdout.Write(json)
 
-	t2 := Transaction{IDPognon: 1,
+	t2 := Transaction{Pognon: &p,
 		Buyers: []Purchase{{"a", 5.4}},
-		Payers: []Purchase{{Person: "a"}, {Person: "b"}, {Person: "c"}},
+		For:    []Purchase{{Person: "a"}, {Person: "b"}, {Person: "c"}},
 		Reason: "bus"}
 	_, err = engine.Insert(t2)
 	if err != nil {
