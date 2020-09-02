@@ -20,7 +20,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		p, err := data.GetPognon(engine, hash)
+		p, err := data.GetPognonJSON(engine, hash)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -31,3 +31,9 @@ type Pognon struct {
 	PognonHash   string `xorm:"unique index"` // Random hash to identify pognon
 	Participants []string
 }
+
+// PognonJSON is a structured response to a pongon request
+type PognonJSON struct {
+	Pognon       *Pognon
+	Transactions *[]Transaction
+}
