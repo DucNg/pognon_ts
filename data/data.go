@@ -16,7 +16,7 @@ type Purchase struct {
 // Transaction is a money transaction for a Pognon
 type Transaction struct {
 	IDTransaction uint16     `xorm:"pk SERIAL"`
-	Pognon        *Pognon    `xorm:"INTEGER NOT NULL INDEX"` // Reference to a pognon
+	Pognon        *Pognon    `xorm:"INTEGER NOT NULL INDEX" json:"-"` // Reference to a pognon
 	Buyers        []Purchase // The ones who payed and how much
 	For           []Purchase // The ones who used the money and how much
 	Reason        string     // What was payed
