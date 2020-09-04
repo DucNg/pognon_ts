@@ -52,6 +52,9 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 	if err != nil {
 		return nil, err
 	}
+	if p == nil {
+		return nil, nil
+	}
 	t, err := getTransactions(engine, p)
 	if err != nil {
 		return nil, err

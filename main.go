@@ -6,32 +6,35 @@ import (
 	"net/http"
 
 	"github.com/DucNg/pognon_ts/data"
-	"github.com/gin-gonic/gin" // TODO migrate to echo or httprouter
+	"github.com/labstack/echo"
 )
 
+func getPognon(c echo.Context) error {
+	hash := c.Param("hash")
+
+	engine, err := data.GetEngine()
+	defer engine.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	p, err := data.GetPognonJSON(engine, hash)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if p == nil {
+		return c.JSON(http.StatusNotFound, "No pognon for this hash")
+	}
+
+	return c.JSON(http.StatusOK, p)
+}
+
 func main() {
-	r := gin.Default()
+	e := echo.New()
 
-	r.GET("/:hash", func(c *gin.Context) {
-		hash := c.Param("hash")
+	e.GET("/api/:hash", getPognon)
 
-		engine, err := data.GetEngine()
-		defer engine.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-		p, err := data.GetPognonJSON(engine, hash)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if p == nil {
-			c.JSON(http.StatusNotFound, "No pognon for this hash")
-			return
-		}
-
-		c.JSON(http.StatusOK, p)
-	})
+	e.Static("/", "./pognon-web-ui/build")
 
 	fmt.Print("Server running on :8080")
-	r.Run(":8080")
+	e.Logger.Fatal(e.Start(":8080"))
 }
