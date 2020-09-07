@@ -5,22 +5,35 @@ import 'fontsource-roboto/400.css';
 import 'fontsource-roboto/500.css';
 import 'fontsource-roboto/700.css';
 
-import { AppBar, Button, Toolbar, Grid, Typography, Container, Box } from '@material-ui/core';
+import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent } from '@material-ui/core';
 import { FetchData } from './FetchData';
 
 function App() {
-  const [pognon, setPognon] = useState("");
+  const [pognon, setPognon] = useState(Object);
+  const [participants, setParcitipants] = useState("");
 
   useEffect(() => {
     async function fetch() { 
       try {
-        const data = await FetchData("abcdefgh") 
-        setPognon(data.Pognon.IDPognon.toString())
+        const data = await FetchData("abcdefgh") ;
+        setPognon(data.Pognon);
+        const listItems = pognon.Participants.map((person: string) =>
+        <Grid key={person} item xs={3}>
+          <Card key={person}>
+          <CardContent key={person}>
+            <Typography key={person}>{person}</Typography>
+          </CardContent>
+          </Card>
+        </Grid>
+      );
+        setParcitipants(listItems);
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     };
-    fetch();
+    if (!participants) {
+      fetch();
+    }
   });
 
   return (
@@ -35,12 +48,7 @@ function App() {
       <Container className="container">
         <Box mt={2}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={8} lg={9}>
-              <Button variant="contained" color="primary">Hello world</Button>
-            </Grid>
-            <Grid item xs={12} md={8} lg={9}>
-              <Typography variant="body1">{pognon}</Typography>
-            </Grid>
+            {participants}
           </Grid>
         </Box>
       </Container>
