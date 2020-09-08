@@ -5,33 +5,29 @@ import 'fontsource-roboto/400.css';
 import 'fontsource-roboto/500.css';
 import 'fontsource-roboto/700.css';
 
-import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent } from '@material-ui/core';
+import moment from 'moment';
+
+import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent, 
+  CardHeader, Avatar, Paper, Table, TableCell, TableRow, TableHead, TableBody,
+  TableContainer } from '@material-ui/core';
 import { FetchData } from './FetchData';
+import { Transaction, columns } from './Data';
 
 function App() {
   const [pognon, setPognon] = useState(Object);
-  const [participants, setParcitipants] = useState("");
+  const [transactions, setTransactions] = useState(Object)
 
   useEffect(() => {
     async function fetch() { 
       try {
         const data = await FetchData("abcdefgh") ;
         setPognon(data.Pognon);
-        const listItems = pognon.Participants.map((person: string) =>
-        <Grid key={person} item xs={3}>
-          <Card key={person}>
-          <CardContent key={person}>
-            <Typography key={person}>{person}</Typography>
-          </CardContent>
-          </Card>
-        </Grid>
-      );
-        setParcitipants(listItems);
+        setTransactions(data.Transactions);
       } catch (err) {
         console.log(err);
       }
     };
-    if (!participants) {
+    if (!pognon.Participants) {
       fetch();
     }
   });
@@ -45,13 +41,48 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Container className="container">
-        <Box mt={2}>
+      <Container className="container"><Box mt={2}>
           <Grid container spacing={3}>
-            {participants}
+            {pognon.Participants && pognon.Participants.map((person: string) => (
+              <Grid key={person} item xs={3}>
+                <Card key={person}>
+                <CardHeader key={person}
+                  avatar={<Avatar aria-label="person">{person[0]}</Avatar>}
+                  title={<Typography variant="h5">{person}</Typography>}
+                >
+                </CardHeader>
+                <CardContent>
+                  <Typography variant="body1">Amount payed: 0€</Typography>
+                  <Typography variant="body2">Owe 25€ to Lorem</Typography>
+                </CardContent>
+                </Card>
+              </Grid>))}
+              <Grid item xs={12}>
+                <Paper><TableContainer><Table stickyHeader aria-label="sticky table">
+                  <TableHead>
+                    <TableRow>
+                      {columns.map((column) => (
+                        <TableCell key={column.id}>
+                          {column.label}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transactions[0] && transactions.map((transaction: Transaction) => (
+                      <TableRow hover key={transaction.IDTransaction}>
+                        <TableCell key={transaction.IDTransaction + "buyers"}>{transaction.Buyers.map(e => e.Person)}</TableCell>
+                        <TableCell key={transaction.IDTransaction + "amount"}>{transaction.Buyers[0].Amount}</TableCell>
+                        <TableCell key={transaction.IDTransaction + "for"}>{transaction.For.map(e => e.Person)}</TableCell>
+                        <TableCell key={transaction.IDTransaction + "reason"}>{transaction.Reason}</TableCell>
+                        <TableCell key={transaction.IDTransaction + "date"}>{moment(transaction.CreatedAt).fromNow()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table></TableContainer></Paper>
+              </Grid>
           </Grid>
-        </Box>
-      </Container>
+        </Box></Container>
 
       <meta
         name="viewport"
