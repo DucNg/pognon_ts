@@ -6,8 +6,8 @@ import (
 
 // GetEngine get a database connection
 // Create or update tables
-func GetEngine() (*xorm.Engine, error) {
-	engine, err := xorm.NewEngine("sqlite3", "./pognon.db")
+func GetEngine(databaseFile string) (*xorm.Engine, error) {
+	engine, err := xorm.NewEngine("sqlite3", databaseFile)
 	if err != nil {
 		return nil, err
 	}
@@ -20,8 +20,8 @@ func GetEngine() (*xorm.Engine, error) {
 	return engine, nil
 }
 
-// getPognon for a hash returns corresponding pognon
-func getPognon(engine *xorm.Engine, hash string) (*Pognon, error) {
+// GetPognon for a hash returns corresponding pognon
+func GetPognon(engine *xorm.Engine, hash string) (*Pognon, error) {
 	p := Pognon{PognonHash: hash}
 	has, err := engine.Get(&p)
 	if err != nil {
@@ -48,7 +48,7 @@ func getTransactions(engine *xorm.Engine, pognon *Pognon) (*[]Transaction, error
 
 // GetPognonJSON given a hash build a JSON response with corresponding pognon
 func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
-	p, err := getPognon(engine, hash)
+	p, err := GetPognon(engine, hash)
 	if err != nil {
 		return nil, err
 	}

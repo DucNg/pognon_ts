@@ -27,7 +27,7 @@ type Transaction struct {
 
 // Pognon is a list of transactions and participants
 type Pognon struct {
-	IDPognon     uint16 `xorm:"pk SERIAL"`
+	IDPognon     uint16 `xorm:"pk SERIAL" json:"-"`
 	PognonHash   string `xorm:"unique index"` // Random hash to identify pognon
 	Participants []string
 }

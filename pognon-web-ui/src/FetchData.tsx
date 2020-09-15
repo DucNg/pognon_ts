@@ -6,7 +6,7 @@ export async function FetchData(hash: string) {
         instance.defaults.baseURL = 'http://localhost:8080';
     }
     try {
-        const result = await instance.get(`api/${hash}`);
+        const result = await instance.get(`api/pognon/${hash}`);
         return result.data;
     } catch (err) {
         throw err;

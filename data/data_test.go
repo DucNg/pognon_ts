@@ -12,6 +12,7 @@ import (
 )
 
 func init() {
+	// Delete any existing database file before running test
 	exec.Command("rm", "test.db").Run()
 }
 
