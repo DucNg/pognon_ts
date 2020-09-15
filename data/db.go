@@ -61,3 +61,9 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 	}
 	return &PognonJSON{p, t}, nil
 }
+
+// WritePognon write a new Pognon to database
+func WritePognon(engine *xorm.Engine, pognon *Pognon) error {
+	_, err := engine.Insert(pognon)
+	return err
+}
