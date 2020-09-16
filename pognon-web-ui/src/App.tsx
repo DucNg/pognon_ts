@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import 'fontsource-roboto/300.css';
 import 'fontsource-roboto/400.css';
@@ -6,6 +6,12 @@ import 'fontsource-roboto/500.css';
 import 'fontsource-roboto/700.css';
 
 import moment from 'moment';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useParams
+} from 'react-router-dom';
 
 import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent, 
   CardHeader, Avatar, Paper, Table, TableCell, TableRow, TableHead, TableBody,
@@ -17,20 +23,25 @@ function App() {
   const [pognon, setPognon] = useState(Object);
   const [transactions, setTransactions] = useState(Object)
 
-  useEffect(() => {
-    async function fetch() { 
-      try {
-        const data = await FetchData("abcdefgh") ;
-        setPognon(data.Pognon);
+  async function fetch(hash: string) { 
+    try {
+      const data = await FetchData(hash) ;
+      setPognon(data.Pognon);
+      if (data.Transaction) {
         setTransactions(data.Transactions);
-      } catch (err) {
-        console.log(err);
       }
-    };
-    if (!pognon.Participants) {
-      fetch();
+    } catch (err) {
+      console.log(err);
     }
-  });
+  };
+
+  function GetPognon() {
+    const { hash }  = useParams();
+    if (!pognon.PognonHash) {
+      fetch(hash)
+    }
+    return <div></div>
+  }
 
   return (
     <React.Fragment><CssBaseline>
@@ -88,6 +99,11 @@ function App() {
         name="viewport"
         content="minimum-scale=1, initial-scale=1, width=device-width"
       />  
+      <Router>
+        <Switch>
+          <Route path="/:hash"><GetPognon/></Route>
+        </Switch>
+      </Router>
     </CssBaseline></React.Fragment>
   );
 }
