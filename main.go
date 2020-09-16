@@ -27,6 +27,20 @@ func getPognon(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
+func getTransactions(c echo.Context) error {
+	hash := c.Param("hash")
+
+	p, err := data.GetTransactions(engine, hash)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	if p == nil {
+		return c.JSON(http.StatusNotFound, "No transactions for this hash")
+	}
+
+	return c.JSON(http.StatusOK, p)
+}
+
 func getPognonJSON(c echo.Context) error {
 	hash := c.Param("hash")
 
@@ -56,6 +70,19 @@ func postPognon(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
+func postTransaction(c echo.Context) error {
+	t := new(data.Transaction)
+	if err := c.Bind(t); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	t.PognonHash = c.Param("hash")
+	err := data.WriteTransaction(engine, t)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, t)
+}
+
 func main() {
 	var err error
 	engine, err = data.GetEngine("./pognon.db")
@@ -67,6 +94,7 @@ func main() {
 
 	e.GET("/api/pognon/:hash", getPognonJSON)
 	e.POST("/api/pognon", postPognon)
+	e.POST("/api/pognon/:hash/transaction", postTransaction)
 
 	e.Static("/", "./pognon-web-ui/build")
 

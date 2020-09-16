@@ -1,6 +1,8 @@
 package data
 
 import (
+	"errors"
+
 	"github.com/go-xorm/xorm"
 )
 
@@ -33,10 +35,10 @@ func GetPognon(engine *xorm.Engine, hash string) (*Pognon, error) {
 	return &p, nil
 }
 
-// idTransaction for a given pognon get the corresponding transactions
-func getTransactions(engine *xorm.Engine, pognon *Pognon) (*[]Transaction, error) {
+// GetTransactions for a given pognon hash get the corresponding transactions
+func GetTransactions(engine *xorm.Engine, hash string) (*[]Transaction, error) {
 	t := []Transaction{}
-	err := engine.Find(&t, &Transaction{Pognon: pognon})
+	err := engine.Find(&t, &Transaction{PognonHash: hash})
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +57,7 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 	if p == nil {
 		return nil, nil
 	}
-	t, err := getTransactions(engine, p)
+	t, err := GetTransactions(engine, hash)
 	if err != nil {
 		return nil, err
 	}
@@ -65,5 +67,19 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 // WritePognon write a new Pognon to database
 func WritePognon(engine *xorm.Engine, pognon *Pognon) error {
 	_, err := engine.Insert(pognon)
+	return err
+}
+
+// WriteTransaction write a transaction to database
+func WriteTransaction(engine *xorm.Engine, transaction *Transaction) error {
+	p := Pognon{PognonHash: transaction.PognonHash}
+	has, err := engine.Get(&p)
+	if err != nil {
+		return err
+	}
+	if !has {
+		return errors.New("no pognon for this hash")
+	}
+	_, err = engine.Insert(transaction)
 	return err
 }

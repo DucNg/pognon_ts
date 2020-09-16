@@ -38,10 +38,10 @@ func TestDatabase(t *testing.T) {
 	t.Log("Wrote pognon to database")
 
 	t1 := Transaction{
-		Pognon: &p,
-		Buyers: []Purchase{{"a", 10.25}},
-		For:    []Purchase{{"a", 5}, {"c", 3}, {"a", 2.25}},
-		Reason: "love",
+		PognonHash: "abcdefgh",
+		Buyers:     []Purchase{{"a", 10.25}},
+		For:        []Purchase{{"a", 5}, {"c", 3}, {"a", 2.25}},
+		Reason:     "love",
 	}
 	_, err = engine.Insert(t1)
 	if err != nil {
@@ -58,10 +58,10 @@ func TestDatabase(t *testing.T) {
 	os.Stdout.Write(json)
 
 	t2 := Transaction{
-		Pognon: &p,
-		Buyers: []Purchase{{"a", 5.4}},
-		For:    []Purchase{{Person: "a"}, {Person: "b"}, {Person: "c"}},
-		Reason: "bus",
+		PognonHash: "abcdefgh",
+		Buyers:     []Purchase{{"a", 5.4}},
+		For:        []Purchase{{Person: "a"}, {Person: "b"}, {Person: "c"}},
+		Reason:     "bus",
 	}
 	_, err = engine.Insert(t2)
 	if err != nil {
@@ -94,10 +94,10 @@ func TestMongo(t *testing.T) {
 
 	c = session.DB("pognon").C("transaction")
 	t1 := Transaction{
-		Pognon: &p,
-		Buyers: []Purchase{{"a", 10.25}},
-		For:    []Purchase{{"a", 5}, {"c", 3}, {"a", 2.25}},
-		Reason: "love",
+		PognonHash: "abcdefgh",
+		Buyers:     []Purchase{{"a", 10.25}},
+		For:        []Purchase{{"a", 5}, {"c", 3}, {"a", 2.25}},
+		Reason:     "love",
 	}
 	err = c.Insert(&t1)
 	if err != nil {
