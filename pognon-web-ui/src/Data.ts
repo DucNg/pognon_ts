@@ -1,5 +1,11 @@
+export interface Person {
+    IDPerson: number
+    Name: string
+    Debt: number
+}
+
 export interface Purchase {
-	Person: string;
+	IDPerson: number;
 	Amount: number;
 }
 
@@ -19,12 +25,12 @@ export interface Transaction {
 export interface Pognon {
 	IDPognon:     number;
 	PognonHash:   string;
-	Participants: string[];
 }
 
 // PognonJSON is a structured response to a pongon request
 export interface PognonJSON {
-	Pognon:       Pognon;
+    Pognon:       Pognon;
+    Participants: Person[];
 	Transactions: Transaction[];
 }
 

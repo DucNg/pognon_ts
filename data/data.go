@@ -7,10 +7,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Person is a participant to a pognon
+type Person struct {
+	IDPerson uint16 `xorm:"pk SERIAL"`
+	Name     string
+}
+
 // Purchase is an amount payed by someone or an amount used by someone
 type Purchase struct {
-	Person string
-	Amount float32
+	IDPerson uint16
+	Amount   float32
 }
 
 // Transaction is a money transaction for a Pognon
@@ -27,13 +33,19 @@ type Transaction struct {
 
 // Pognon is a list of transactions and participants
 type Pognon struct {
-	IDPognon     uint16 `xorm:"pk SERIAL" json:"-"`
-	PognonHash   string `xorm:"unique index"` // Random hash to identify pognon
-	Participants []string
+	IDPognon   uint16 `xorm:"pk SERIAL" json:"-"`
+	PognonHash string `xorm:"unique index"` // Random hash to identify pognon
+}
+
+// Participants is a list of participants to a pognon
+type Participants struct {
+	IDPognon uint16
+	IDPerson uint16
 }
 
 // PognonJSON is a structured response to a pongon request
 type PognonJSON struct {
 	Pognon       *Pognon
+	Participants *[]Person
 	Transactions *[]Transaction
 }

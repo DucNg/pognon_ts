@@ -14,7 +14,7 @@ func GetEngine(databaseFile string) (*xorm.Engine, error) {
 		return nil, err
 	}
 
-	err = engine.Sync2(new(Transaction), new(Pognon))
+	err = engine.Sync2(new(Transaction), new(Pognon), new(Person), new(Participants))
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +48,19 @@ func GetTransactions(engine *xorm.Engine, hash string) (*[]Transaction, error) {
 	return &t, nil
 }
 
+// GetParticipants given a IDPognon get list of participants
+func GetParticipants(engine *xorm.Engine, idpognon uint16) (*[]Person, error) {
+	par := []Person{}
+	err := engine.Find(&par, &Participants{IDPognon: idpognon})
+	if err != nil {
+		return nil, err
+	}
+	if len(par) <= 0 {
+		return nil, nil
+	}
+	return &par, nil
+}
+
 // GetPognonJSON given a hash build a JSON response with corresponding pognon
 func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 	p, err := GetPognon(engine, hash)
@@ -61,7 +74,11 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &PognonJSON{p, t}, nil
+	par, err := GetParticipants(engine, p.IDPognon)
+	if err != nil {
+		return nil, err
+	}
+	return &PognonJSON{p, par, t}, nil
 }
 
 // WritePognon write a new Pognon to database
