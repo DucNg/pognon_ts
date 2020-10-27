@@ -4,6 +4,7 @@ import 'fontsource-roboto/300.css';
 import 'fontsource-roboto/400.css';
 import 'fontsource-roboto/500.css';
 import 'fontsource-roboto/700.css';
+import './App.css';
 
 import moment from 'moment';
 import {
@@ -19,6 +20,7 @@ import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent,
 import { FetchData } from './fetchData';
 import { Transaction, Person, columns } from './data';
 import { calcDebt } from './calculation';
+import AddTransaction from './AddTransaction'
 
 function App() {
   const [participants, setParticipants] = useState<Person[]>(Object);
@@ -63,6 +65,7 @@ function App() {
           <Typography variant="h6" className="title">
             Pognon_ts
           </Typography>
+          <AddTransaction participants={participants}/>
         </Toolbar>
       </AppBar>
       <Container className="container"><Box mt={2}>
