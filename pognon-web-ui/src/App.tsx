@@ -10,14 +10,14 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  useParams
+  RouteComponentProps
 } from 'react-router-dom';
 
 import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent, 
   CardHeader, Avatar, Paper, Table, TableCell, TableRow, TableHead, TableBody,
   TableContainer } from '@material-ui/core';
-import { FetchData } from './FetchData';
-import { Transaction, Person, columns } from './Data';
+import { FetchData } from './fetchData';
+import { Transaction, Person, columns } from './data';
 import { calcDebt } from './calculation';
 
 function App() {
@@ -47,10 +47,11 @@ function App() {
     return participantsMap;
   }
 
-  function GetPognon() {
-    const { hash }  = useParams();
+  type TParams = { hash: string };
+
+  function GetPognon({ match }: RouteComponentProps<TParams>) {
     if (!participants[0]) {
-      fetch(hash)
+      fetch(match.params.hash)
     }
     return <div></div>
   };
@@ -120,7 +121,7 @@ function App() {
       />  
       <Router>
         <Switch>
-          <Route path="/:hash"><GetPognon/></Route>
+          <Route path="/:hash" component={GetPognon}/>
         </Switch>
       </Router>
     </CssBaseline></React.Fragment>

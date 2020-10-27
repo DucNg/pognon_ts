@@ -1,4 +1,4 @@
-import { Person, Transaction } from './Data'
+import { Person, Transaction } from './data'
 
 export function calcDebt(participants: Person[], transactions: Transaction[]): Person[] {
     // Initialize debt

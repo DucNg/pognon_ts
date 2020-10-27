@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PognonJSON } from './Data';
+import { PognonJSON } from './data';
 
 export async function FetchData(hash: string): Promise<PognonJSON> {
     const instance = axios.create();
