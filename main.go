@@ -8,6 +8,7 @@ import (
 	"github.com/DucNg/pognon_ts/data"
 	"github.com/go-xorm/xorm"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	sqlite "github.com/mattn/go-sqlite3"
 )
 
@@ -99,12 +100,14 @@ func main() {
 	}
 	defer engine.Close()
 	e := echo.New()
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:  "./pognon-web-ui/build",
+		HTML5: true,
+	}))
 
 	e.GET("/api/pognon/:hash", getPognonJSON)
 	e.POST("/api/pognon", postPognon)
 	e.POST("/api/pognon/:hash/transaction", postTransaction)
-
-	e.Static("/", "./pognon-web-ui/build")
 
 	fmt.Print("Server running on :8080")
 	e.Logger.Fatal(e.Start(":8080"))
