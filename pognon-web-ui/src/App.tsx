@@ -17,10 +17,10 @@ import {
 import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent, 
   CardHeader, Avatar, Paper, Table, TableCell, TableRow, TableHead, TableBody,
   TableContainer } from '@material-ui/core';
-import { FetchData } from './fetchData';
-import { Transaction, Person, columns } from './data';
-import { calcDebt } from './calculation';
-import AddTransaction from './AddTransaction'
+import { FetchData } from './utils/fetchData';
+import { Transaction, Person, columns } from './utils/data';
+import { calcDebt } from './utils/calculation';
+import AddTransaction from './AddTransactionDialog/AddTransaction'
 
 function App() {
   const [participants, setParticipants] = useState<Person[]>(Object);
