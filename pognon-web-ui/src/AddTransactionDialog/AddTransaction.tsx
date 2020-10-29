@@ -6,7 +6,7 @@ import { Add } from '@material-ui/icons'
 
 import './AddTransaction.css'
 
-import { Person } from '../utils/data';
+import { Person,Transaction } from '../utils/data';
 import SelectPersons from './SelectPersons'
 
 interface Props {
@@ -21,6 +21,11 @@ interface item {
 function AddTransaction({participants}: Props) {
     const [open, setOpen] = useState(false);
     const [isEveryone, setIsEveryone] = useState(true)
+    const [transaction, setTransaction] = useState<Transaction>({
+        Buyers: [{IDPerson: -1,Amount: 0}],
+        For: [{IDPerson: -1,Amount: 0}],
+        Reason: "",
+    })
 
     const add = () => {
         setOpen(true)
@@ -46,7 +51,7 @@ function AddTransaction({participants}: Props) {
             <DialogContent>
                 <Box mb={2}>
                 <DialogContentText variant="h6">Who payed?</DialogContentText>
-                <SelectPersons type="buyer" participants={participants}/>
+                <SelectPersons type="Buyers" participants={participants} transaction={transaction} setTransaction={setTransaction}/>
                 </Box>
                 <DialogContentText variant="h6">Who benefits from the payment?</DialogContentText>
                 <FormControlLabel
@@ -54,7 +59,7 @@ function AddTransaction({participants}: Props) {
                     label="Everyone"
                 />
                 {!isEveryone &&
-                <SelectPersons type="for" participants={participants}/>
+                <SelectPersons type="For" participants={participants} transaction={transaction} setTransaction={setTransaction}/>
                 }
                 <TextField
                     margin="dense"
