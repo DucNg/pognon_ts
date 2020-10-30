@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
 
@@ -91,6 +91,12 @@ func postTransaction(c echo.Context) error {
 }
 
 func main() {
+	allowCORS := flag.Bool("allow-cors", false,
+		"Allow CORS for test purposes. Allow the usage of the build in node "+
+			"server to test frontend.")
+	port := flag.String("port", ":8080", "Specify bind address")
+	flag.Parse()
+
 	log.SetFlags(log.Lshortfile) // Enable line number on error
 
 	var err error
@@ -99,16 +105,26 @@ func main() {
 		log.Fatal(err)
 	}
 	defer engine.Close()
+
 	e := echo.New()
+
+	// Serve frontend files staticly
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root:  "./pognon-web-ui/build",
 		HTML5: true,
 	}))
 
+	// Disable CORS when we are in a dev environment.
+	// Allow the usage of the build in node server to
+	// test frontend.
+	if *allowCORS {
+		e.Use(middleware.CORS())
+	}
+
+	// Routes declarations
 	e.GET("/api/pognon/:hash", getPognonJSON)
 	e.POST("/api/pognon", postPognon)
 	e.POST("/api/pognon/:hash/transaction", postTransaction)
 
-	fmt.Print("Server running on :8080")
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(*port))
 }

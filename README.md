@@ -18,7 +18,7 @@ cd pognon_ts
 **Required: Go >= 1.15**
 
 ```shell
-go run main.go
+go run main.go -allow-cors
 ```
 
 Access backend on http://localhost:8080/
@@ -38,9 +38,6 @@ npm start
 ```
 
 Access frontend on http://localhost:3000/
-
-You might need to install a plugin to allow CORS to access backend from the
-frontend
 
 ## Prod environment
 

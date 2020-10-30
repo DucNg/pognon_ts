@@ -12,7 +12,6 @@ export interface Purchase {
 // Transaction is a money transaction for a Pognon
 export interface Transaction {
 	IDTransaction?: number;
-	Pognon?:        Pognon;
 	Buyers:        Purchase[]; // The ones who payed and how much
 	For:           Purchase[]; // The ones who used the money and how much
 	Reason:        string;     // What was payed

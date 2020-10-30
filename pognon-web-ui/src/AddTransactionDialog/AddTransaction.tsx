@@ -8,9 +8,11 @@ import './AddTransaction.css'
 
 import { Person,Transaction } from '../utils/data';
 import SelectPersons from './SelectPersons'
+import { postTransaction } from '../utils/api';
 
 interface Props {
-    participants: Person[]
+    pognonHash: string,
+    participants: Person[],
 }
 
 interface item {
@@ -18,7 +20,7 @@ interface item {
     for: string[],
 }
 
-function AddTransaction({participants}: Props) {
+function AddTransaction({pognonHash, participants}: Props) {
     const [open, setOpen] = useState(false);
     const [isEveryone, setIsEveryone] = useState(true)
     const [transaction, setTransaction] = useState<Transaction>({
@@ -35,11 +37,20 @@ function AddTransaction({participants}: Props) {
         setOpen(false);
     };
 
-
-
     const toggleEveryone = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsEveryone(event.target.checked)
     }
+
+    const handleAdd = async () => {
+        transaction.Buyers.pop();
+        transaction.For.pop();
+        try {
+            const res = await postTransaction(pognonHash, transaction);
+            console.log(res);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return(
         <div>
@@ -73,7 +84,7 @@ function AddTransaction({participants}: Props) {
                 <Button onClick={handleCloseDialog} color="primary">
                     Cancel
                 </Button>
-                <Button onClick={handleCloseDialog} color="primary">
+                <Button onClick={handleAdd} color="primary">
                     Add
                 </Button>
             </DialogActions>

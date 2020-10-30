@@ -17,25 +17,27 @@ import {
 import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent, 
   CardHeader, Avatar, Paper, Table, TableCell, TableRow, TableHead, TableBody,
   TableContainer } from '@material-ui/core';
-import { FetchData } from './utils/fetchData';
+import { fetchData } from './utils/api';
 import { Transaction, Person, columns } from './utils/data';
 import { calcDebt } from './utils/calculation';
 import AddTransaction from './AddTransactionDialog/AddTransaction'
 
 function App() {
+  const [pognonHash, setPognonHash] = useState("");
   const [participants, setParticipants] = useState<Person[]>(Object);
   const [transactions, setTransactions] = useState<Transaction[]>(Object);
   const [participantsNames, setParticipantsNames] = useState<Map<number,string>>(new Map());
 
   async function fetch(hash: string) { 
     try {
-      const data = await FetchData(hash) ;
+      const data = await fetchData(hash) ;
       if (data.Transactions) {
         setTransactions(data.Transactions);
       }
       const personsDebts = calcDebt(data.Participants, data.Transactions);
-      setParticipants(personsDebts)
-      setParticipantsNames(matchNames(data.Participants))
+      setParticipants(personsDebts);
+      setParticipantsNames(matchNames(data.Participants));
+      setPognonHash(hash);
     } catch (err) {
       console.log(err);
     }
@@ -53,7 +55,7 @@ function App() {
 
   function GetPognon({ match }: RouteComponentProps<TParams>) {
     if (!participants[0]) {
-      fetch(match.params.hash)
+      fetch(match.params.hash);
     }
     return <div></div>
   };
@@ -65,7 +67,7 @@ function App() {
           <Typography variant="h6" className="title">
             Pognon_ts
           </Typography>
-          <AddTransaction participants={participants}/>
+          <AddTransaction pognonHash={pognonHash} participants={participants}/>
         </Toolbar>
       </AppBar>
       <Container className="container"><Box mt={2}>
