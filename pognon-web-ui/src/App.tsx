@@ -104,7 +104,8 @@ function App() {
                           {transaction.Buyers.map(buyer => 
                             participantsNames.get(buyer.IDPerson)).join(", ")}</TableCell>
                         <TableCell key={transaction.IDTransaction + "amount"}>
-                          {transaction.Buyers[0].Amount}</TableCell>
+                          {transaction.Buyers.reduce((prevValue, buyer) => 
+                              prevValue = buyer.Amount, 0)}</TableCell>
                         <TableCell key={transaction.IDTransaction + "for"}>
                           {transaction.For.map(forWho => 
                             participantsNames.get(forWho.IDPerson)).join(", ")}</TableCell>

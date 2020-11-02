@@ -60,3 +60,10 @@ export const columns: column[] = [
         label: "Date"
     }
 ];
+
+export interface errorTransaction {
+    status: boolean;
+    type: string;
+    index?: number;
+    msg: string;
+}

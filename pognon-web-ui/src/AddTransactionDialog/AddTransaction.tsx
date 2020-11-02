@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, TextField, Fab, 
-    DialogActions, DialogContentText, Box, FormControlLabel, Switch } 
-    from '@material-ui/core'
-import { Add } from '@material-ui/icons'
+    DialogActions, DialogContentText, Box, FormControlLabel, Switch, Snackbar } 
+    from '@material-ui/core';
+import { Add } from '@material-ui/icons';
 
-import './AddTransaction.css'
+import './AddTransaction.css';
 
 import { Person,Transaction } from '../utils/data';
-import SelectPersons from './SelectPersons'
+import SelectPersons from './SelectPersons';
 import { postTransaction } from '../utils/api';
 
 interface Props {
@@ -28,6 +28,11 @@ function AddTransaction({pognonHash, participants}: Props) {
         For: [{IDPerson: -1,Amount: 0}],
         Reason: "",
     })
+    const [error, setError] = useState({
+        status: false,
+        type: "",
+        msg: "",
+    })
 
     const add = () => {
         setOpen(true)
@@ -42,13 +47,49 @@ function AddTransaction({pognonHash, participants}: Props) {
     }
 
     const handleAdd = async () => {
-        transaction.Buyers.pop();
-        transaction.For.pop();
-        try {
-            const res = await postTransaction(pognonHash, transaction);
-            console.log(res);
-        } catch (err) {
-            console.log(err);
+        // Duplicate object
+        const transactionVerify = {...transaction};
+
+        // First line cannot be empty
+        if(transactionVerify.Buyers[0].IDPerson === -1) {
+            setError({status: true, type: "Buyers", msg: "You need at least one buyer"});
+            return
+        }
+
+        // Remove last entry if empty
+        if(transactionVerify.Buyers[transactionVerify.Buyers.length-1].IDPerson === -1) {
+            transactionVerify.Buyers.pop();
+        }
+        if(transactionVerify.For[transactionVerify.For.length-1].IDPerson === -1) {
+            transactionVerify.For.pop();
+        }
+
+        // Add equal parts for everyone if everyone is checked
+        const totalAmount = transactionVerify.Buyers.reduce((prevValue, buyer) => 
+                prevValue = buyer.Amount, 0);
+        if(isEveryone) {
+            const equalPart = totalAmount / participants.length;
+            participants.forEach(participant =>
+                transactionVerify.For.push({IDPerson: participant.IDPerson, Amount: equalPart})
+            );
+        } else {
+            // Make sure buyers amount equals for amount
+            const totalAmountFor = transactionVerify.For.reduce((prevValue, forWho) =>
+                prevValue = forWho.Amount, 0);
+            if(totalAmount !== totalAmountFor) {
+                setError({status: true, type: "For", msg: "Sums aren't equals"});
+                return
+            }
+        }
+
+        // Send POST request to backend
+        if (!error.status) {
+            try {
+                const res = await postTransaction(pognonHash, transactionVerify);
+                console.log(res);
+            } catch (err) {
+                console.log(err);
+            }
         }
     };
 
@@ -62,7 +103,14 @@ function AddTransaction({pognonHash, participants}: Props) {
             <DialogContent>
                 <Box mb={2}>
                 <DialogContentText variant="h6">Who payed?</DialogContentText>
-                <SelectPersons type="Buyers" participants={participants} transaction={transaction} setTransaction={setTransaction}/>
+                <SelectPersons 
+                    type="Buyers" 
+                    participants={participants} 
+                    transaction={transaction} 
+                    setTransaction={setTransaction} 
+                    error={error} 
+                    setError={setError}
+                />
                 </Box>
                 <DialogContentText variant="h6">Who benefits from the payment?</DialogContentText>
                 <FormControlLabel
@@ -70,7 +118,14 @@ function AddTransaction({pognonHash, participants}: Props) {
                     label="Everyone"
                 />
                 {!isEveryone &&
-                <SelectPersons type="For" participants={participants} transaction={transaction} setTransaction={setTransaction}/>
+                <SelectPersons 
+                    type="For" 
+                    participants={participants} 
+                    transaction={transaction} 
+                    setTransaction={setTransaction} 
+                    error={error} 
+                    setError={setError}
+                />
                 }
                 <TextField
                     margin="dense"
@@ -89,6 +144,7 @@ function AddTransaction({pognonHash, participants}: Props) {
                 </Button>
             </DialogActions>
         </Dialog>
+        <Snackbar open={error.status} message={`Error: ${error.msg}`} color="secondary"/>
         </div>
     )
 }
