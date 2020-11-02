@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { TextField, MenuItem, InputLabel, Grid, Select, IconButton } 
     from '@material-ui/core'
-import { Delete } from '@material-ui/icons'
+import { Delete, ExpandMore } from '@material-ui/icons'
 import { Person, Purchase, Transaction } from '../utils/data';
 
 interface Props {
@@ -22,8 +22,9 @@ function SelectPersons({type,participants,transaction, setTransaction}: Props) {
         const newSelection = event.target.value as number;
         const name = event.target.name as keyof item;
         let newArray: Purchase[] = [];
-        if(index === transaction[name].length-1) {
-            newArray = [...transaction[name],{IDPerson: -1, Amount: 0} as Purchase];
+        if((type === "For" || transaction.Buyers.length > 1) &&
+            index === transaction[name].length-1) {
+                newArray = [...transaction[name],{IDPerson: -1, Amount: 0} as Purchase];
         } else {
             newArray = transaction[name].slice();
         }
@@ -43,6 +44,11 @@ function SelectPersons({type,participants,transaction, setTransaction}: Props) {
         transaction[name as keyof item][index].Amount = parseFloat(event.target.value);
         const newObject = {...transaction};
         setTransaction(newObject);
+    }
+
+    const morePersons = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const newArray = [...transaction.Buyers,{IDPerson: -1, Amount: 0} as Purchase];
+        setTransaction({...transaction, Buyers: newArray});
     }
 
     return(
@@ -81,6 +87,12 @@ function SelectPersons({type,participants,transaction, setTransaction}: Props) {
                     />
                 </Grid>
                 <Grid key={"grid-item-button-"+index} item xs={2}>
+                    {index === 0 && type === "Buyers" &&
+                    <IconButton onClick={morePersons} aria-label="more"
+                        disabled={transaction.Buyers.length > 1}>
+                        <ExpandMore/>
+                    </IconButton>
+                    }
                     {index > 0 &&
                     <IconButton name={type} onClick={(event) => removeItem(index,event)} 
                       aria-label="delete">
