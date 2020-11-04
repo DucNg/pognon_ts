@@ -82,8 +82,27 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 }
 
 // WritePognon write a new Pognon to database
-func WritePognon(engine *xorm.Engine, pognon *Pognon) error {
-	_, err := engine.Insert(pognon)
+func WritePognon(engine *xorm.Engine, pognon *PognonJSON) error {
+	_, err := engine.Insert(pognon.Participants)
+	if err != nil {
+		return err
+	}
+
+	_, err = engine.Insert(pognon.Pognon)
+	if err != nil {
+		return err
+	}
+
+	// Link persons and pognon
+	var participants []Participants
+	for _, person := range *pognon.Participants {
+		participants = append(participants, Participants{
+			pognon.Pognon.IDPognon,
+			person.IDPerson,
+		})
+	}
+	_, err = engine.Insert(&participants)
+
 	return err
 }
 

@@ -59,10 +59,14 @@ func getPognonJSON(c echo.Context) error {
 }
 
 func postPognon(c echo.Context) error {
-	p := new(data.Pognon)
+	p := new(data.PognonJSON)
 	if err := c.Bind(p); err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := verifyInputPognon(engine, p); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	err := data.WritePognon(engine, p)
 	if err != nil {
@@ -79,7 +83,11 @@ func postTransaction(c echo.Context) error {
 	t := new(data.Transaction)
 	if err := c.Bind(t); err != nil {
 		log.Println(err)
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := verifyInputTransaction(engine, t); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	t.PognonHash = c.Param("hash")
 	err := data.WriteTransaction(engine, t)

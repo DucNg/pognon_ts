@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os/exec"
@@ -13,7 +14,14 @@ import (
 )
 
 const (
-	pognonExemple1 = `{"PognonHash":"abcdefgh","Participants":["toma","jean","caroline"]}
+	pognonExemple1 = `{
+		"Pognon": {"PognonHash":"abcdefgh"},
+		"Participants":[
+			{"Name": "toma"},
+			{"Name": "jean"},
+			{"Name": "caroline"}
+		]
+}
 `
 	transaction1 = `{
 		"Buyers": [{"Person":"a", "Amount":10.25}],
@@ -62,6 +70,8 @@ func testResult(t *testing.T, recorder *httptest.ResponseRecorder, expected stri
 }
 
 func TestPostPognon(t *testing.T) {
+	log.SetFlags(log.Lshortfile) // Enable line number on error
+
 	t.Log("Test database creation")
 	var err error
 	engine, err = data.GetEngine("test.db")
@@ -78,13 +88,21 @@ func TestPostPognon(t *testing.T) {
 	}
 	testStatusOK(t, rec)
 
+	t.Log("Test create participants")
+
 	t.Log("Test get created pognon")
 	c, rec = createEchoContext(t, http.MethodGet, "/api/pognon/abcdefgh", "", "abcdefgh")
-	err = getPognon(c)
+	err = getPognonJSON(c)
 	if err != nil {
 		t.Fatal(err)
 	}
-	testResult(t, rec, pognonExemple1)
+	testStatusOK(t, rec)
+	dec := json.NewDecoder(rec.Body)
+	t.Log(rec.Body.String())
+	var p data.PognonJSON
+	if err := dec.Decode(&p); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Log("Test add transaction")
 	c, rec = createEchoContext(t, http.MethodPost, "/api/pognon/abcdefgh/transaction", transaction1, "abcdefgh")
@@ -101,7 +119,7 @@ func TestPostPognon(t *testing.T) {
 		t.Fatal(err)
 	}
 	testStatusOK(t, rec)
-	dec := json.NewDecoder(rec.Body)
+	dec = json.NewDecoder(rec.Body)
 	var t1 []data.Transaction
 	if err := dec.Decode(&t1); err != nil {
 		t.Fatal(err)
