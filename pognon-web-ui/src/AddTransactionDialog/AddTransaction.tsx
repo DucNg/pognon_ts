@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, TextField, Fab, 
     DialogActions, DialogContentText, Box, FormControlLabel, Switch, Snackbar } 
     from '@material-ui/core';
@@ -46,6 +46,11 @@ function AddTransaction({pognonHash, participants}: Props) {
         setIsEveryone(event.target.checked)
     }
 
+    const handleReason = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        transaction.Reason = event.target.value;
+        setTransaction({...transaction});
+    }
+
     const handleAdd = async () => {
         // Duplicate object
         const transactionVerify = {...transaction};
@@ -55,6 +60,8 @@ function AddTransaction({pognonHash, participants}: Props) {
             setError({status: true, type: "Buyers", msg: "You need at least one buyer"});
             return
         }
+
+        // TODO: first for cannot be empty if everyone is unchecked
 
         // Remove last entry if empty
         if(transactionVerify.Buyers[transactionVerify.Buyers.length-1].IDPerson === -1) {
@@ -86,9 +93,15 @@ function AddTransaction({pognonHash, participants}: Props) {
         if (!error.status) {
             try {
                 const res = await postTransaction(pognonHash, transactionVerify);
+                setTransaction({
+                    Buyers: [{IDPerson: -1,Amount: 0}],
+                    For: [{IDPerson: -1,Amount: 0}],
+                    Reason: "",
+                });
+                handleCloseDialog();
                 console.log(res);
             } catch (err) {
-                console.log(err);
+                setError({status: true, type: "", msg: `Backend error ${err}`})
             }
         }
     };
@@ -133,6 +146,8 @@ function AddTransaction({pognonHash, participants}: Props) {
                     label="Reason (optional)"
                     type="text"
                     fullWidth
+                    value={transaction.Reason}
+                    onChange={handleReason}
                 />
             </DialogContent>
             <DialogActions>
