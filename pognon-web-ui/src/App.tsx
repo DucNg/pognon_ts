@@ -6,62 +6,62 @@ import 'fontsource-roboto/500.css';
 import 'fontsource-roboto/700.css';
 import './App.css';
 
-import moment from 'moment';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  RouteComponentProps
+  RouteComponentProps, Redirect
 } from 'react-router-dom';
 
-import { AppBar, Card, Toolbar, Grid, Typography, Container, Box, CardContent, 
-  CardHeader, Avatar, Paper, Table, TableCell, TableRow, TableHead, TableBody,
-  TableContainer } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Container, CircularProgress } from '@material-ui/core';
 import { fetchData } from './utils/api';
-import { Transaction, Person, columns } from './utils/data';
+import { Transaction, Person } from './utils/data';
 import { calcDebt } from './utils/calculation';
 import AddTransaction from './AddTransactionDialog/AddTransaction'
+import ParticipantsCards from './DisplayTransactions/ParticipantsCards';
+import TableTransaction from './DisplayTransactions/TableTransactions';
 
 function App() {
   const [pognonHash, setPognonHash] = useState("");
   const [participants, setParticipants] = useState<Person[]>(Object);
   const [transactions, setTransactions] = useState<Transaction[]>(Object);
-  const [participantsNames, setParticipantsNames] = useState<Map<number,string>>(new Map());
+  const [loadingStatus, setLoadingStatus] = useState("loading");
+  
 
   async function fetch(hash: string) { 
     try {
-      const data = await fetchData(hash) ;
+      const data = await fetchData(hash);
+      setLoadingStatus("done");
       if (data.Transactions) {
         setTransactions(data.Transactions);
       }
       const personsDebts = calcDebt(data.Participants, data.Transactions);
       setParticipants(personsDebts);
-      setParticipantsNames(matchNames(data.Participants));
       setPognonHash(hash);
     } catch (err) {
       console.log(err);
+      setLoadingStatus("error");
     }
   };
-
-  function matchNames(participants: Person[]): Map<number,string> {
-    const participantsMap = new Map();
-    participants.forEach(participant => {
-      participantsMap.set(participant.IDPerson,participant.Name);
-    })
-    return participantsMap;
-  }
 
   type TParams = { hash: string };
 
+  function GetCreatePognon() {
+    return(
+      <Typography variant="h1">Welcome to Pognon_ts</Typography>
+    )
+  }
+
   function GetPognon({ match }: RouteComponentProps<TParams>) {
     if (!participants[0]) {
-      fetch(match.params.hash);
+      try {
+        fetch(match.params.hash);
+      } catch {
+        return <div></div>
+      }
     }
-    return <div></div>
-  };
-
-  return (
-    <React.Fragment><CssBaseline>
+    return (
+      <React.Fragment>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className="title">
@@ -70,57 +70,23 @@ function App() {
           <AddTransaction pognonHash={pognonHash} participants={participants}/>
         </Toolbar>
       </AppBar>
-      <Container className="container"><Box mt={2}>
-          <Grid container spacing={3}>
-            {participants[0] && participants.map((person: Person) => (
-              <Grid key={person.Name} item xs={3}>
-                <Card key={person.Name}>
-                <CardHeader key={person.Name}
-                  avatar={<Avatar aria-label="person">{person.Name[0]}</Avatar>}
-                  title={<Typography variant="h5">{person.Name}</Typography>}
-                >
-                </CardHeader>
-                <CardContent>
-                  <Typography variant="body1">Debt: {person.Debt.toFixed(2)}€</Typography>
-                  <Typography variant="body2">Owe 25€ to Lorem</Typography>
-                </CardContent>
-                </Card>
-              </Grid>))}
-              <Grid item xs={12}>
-                <Paper><TableContainer><Table stickyHeader aria-label="sticky table">
-                  <TableHead>
-                    <TableRow>
-                      {columns.map((column) => (
-                        <TableCell key={column.id}>
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {transactions[0] && transactions.map((transaction: Transaction) => (
-                      <TableRow hover key={transaction.IDTransaction}>
-                        <TableCell key={transaction.IDTransaction + "buyers"}>
-                          {transaction.Buyers.map(buyer => 
-                            participantsNames.get(buyer.IDPerson)).join(", ")}</TableCell>
-                        <TableCell key={transaction.IDTransaction + "amount"}>
-                          {transaction.Buyers.reduce((prevValue, buyer) => 
-                              prevValue = buyer.Amount, 0)}</TableCell>
-                        <TableCell key={transaction.IDTransaction + "for"}>
-                          {transaction.For.map(forWho => 
-                            participantsNames.get(forWho.IDPerson)).join(", ")}</TableCell>
-                        <TableCell key={transaction.IDTransaction + "reason"}>
-                          {transaction.Reason}</TableCell>
-                        <TableCell key={transaction.IDTransaction + "date"}>
-                          {moment(transaction.CreatedAt).fromNow()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table></TableContainer></Paper>
-              </Grid>
-          </Grid>
-        </Box></Container>
+      <Container className="container">
+          <ParticipantsCards participants={participants}/>
+          <TableTransaction transactions={transactions} participants={participants}/>
+          {loadingStatus === "loading" &&
+            <CircularProgress/>
+          }
+          {loadingStatus === "error" &&
+            <Redirect to={{pathname: "/"}} />
+          }
+      </Container>
+      
+      </React.Fragment>
+    )
+  };
 
+  return (
+    <React.Fragment><CssBaseline>
       <meta
         name="viewport"
         content="minimum-scale=1, initial-scale=1, width=device-width"
@@ -128,6 +94,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/:hash" component={GetPognon}/>
+          <Route path="/" component={GetCreatePognon}/>
         </Switch>
       </Router>
     </CssBaseline></React.Fragment>
