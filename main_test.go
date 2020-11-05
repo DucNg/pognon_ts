@@ -24,11 +24,21 @@ const (
 }
 `
 	transaction1 = `{
-		"Buyers": [{"Person":"a", "Amount":10.25}],
-		"For":    [{"Person":"a", "Amount":5}, {"Person":"c", "Amount":3}, {"Person":"a", "Amount":2.25}],
+		"Buyers": [{"IDPerson":1, "Amount":10.25}],
+		"For":    [{"IDPerson":1, "Amount":5}, {"IDPerson":2, "Amount":3}, {"IDPerson":3, "Amount":2.25}],
 		"Reason": "love"
 }
 `
+
+	transaction2 = `{
+		"Buyers": [{"IDPerson":1, "Amount":1234}],
+		"For":	  [{"IDPerson":2, "Amount":300}]
+}`
+
+	transaction3 = `{
+		"Buyers": [{"IDPerson":30, "Amount":1234}],
+		"For":    [{"IDPerson":82, "Amount":1234}]
+}`
 )
 
 func init() {
@@ -57,6 +67,12 @@ func testStatusOK(t *testing.T, recorder *httptest.ResponseRecorder) {
 func testStatus500(t *testing.T, recorder *httptest.ResponseRecorder) {
 	if recorder.Code != http.StatusInternalServerError {
 		t.Fatal("Response wasn't 500", recorder.Code, recorder.Body.String())
+	}
+}
+
+func testStatus400(t *testing.T, recorder *httptest.ResponseRecorder) {
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatal("Response wasn't 400", recorder.Code, recorder.Body.String())
 	}
 }
 
@@ -132,5 +148,21 @@ func TestPostPognon(t *testing.T) {
 		t.Fatal(err)
 	}
 	testStatus500(t, rec)
+
+	t.Log("Test inequal sums")
+	c, rec = createEchoContext(t, http.MethodPost, "/api/pognon/abcdefgh/transaction", transaction2, "abcdefgh")
+	err = postTransaction(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatus400(t, rec)
+
+	t.Log("Test non existing IDPerson")
+	c, rec = createEchoContext(t, http.MethodPost, "/api/pognon/abcdefgh/transaction", transaction3, "abcdefgh")
+	err = postTransaction(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatus400(t, rec)
 
 }

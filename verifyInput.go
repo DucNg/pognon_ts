@@ -52,7 +52,8 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 
 	// Every IDPerson must exist in DB
 	for _, purchase := range transaction.Buyers {
-		has, err := db.Get(&data.Person{IDPerson: purchase.IDPerson})
+		var person = data.Person{IDPerson: purchase.IDPerson}
+		has, err := db.ID(purchase.IDPerson).Get(&person)
 		if err != nil {
 			return err
 		}
@@ -63,7 +64,8 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 		}
 	}
 	for _, purchase := range transaction.For {
-		has, err := db.Get(&data.Person{IDPerson: purchase.IDPerson})
+		var person = data.Person{IDPerson: purchase.IDPerson}
+		has, err := db.ID(purchase.IDPerson).Get(&person)
 		if err != nil {
 			return err
 		}
