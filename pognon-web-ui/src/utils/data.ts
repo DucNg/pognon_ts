@@ -1,7 +1,7 @@
 export interface Person {
-    IDPerson: number
+    IDPerson?: number
     Name: string
-    Debt: number
+    Debt?: number
 }
 
 export interface Purchase {
@@ -22,7 +22,7 @@ export interface Transaction {
 
 // Pognon is a list of transactions and participants
 export interface Pognon {
-	IDPognon:     number;
+	IDPognon?:     number;
 	PognonHash:   string;
 }
 
@@ -30,7 +30,7 @@ export interface Pognon {
 export interface PognonJSON {
     Pognon:       Pognon;
     Participants: Person[];
-	Transactions: Transaction[];
+	Transactions?: Transaction[];
 }
 
 export interface column {
@@ -63,7 +63,7 @@ export const columns: column[] = [
 
 export interface errorTransaction {
     status: boolean;
-    type: string;
+    type?: string;
     index?: number;
     msg: string;
 }

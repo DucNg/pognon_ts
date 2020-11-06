@@ -20,6 +20,7 @@ import { calcDebt } from './utils/calculation';
 import AddTransaction from './AddTransactionDialog/AddTransaction'
 import ParticipantsCards from './DisplayTransactions/ParticipantsCards';
 import TableTransaction from './DisplayTransactions/TableTransactions';
+import HomePage from './HomePage';
 
 function App() {
   const [pognonHash, setPognonHash] = useState("");
@@ -35,7 +36,7 @@ function App() {
       if (data.Transactions) {
         setTransactions(data.Transactions);
       }
-      const personsDebts = calcDebt(data.Participants, data.Transactions);
+      const personsDebts = calcDebt(data.Participants, data.Transactions as Transaction[]);
       setParticipants(personsDebts);
       setPognonHash(hash);
     } catch (err) {
@@ -48,7 +49,7 @@ function App() {
 
   function GetCreatePognon() {
     return(
-      <Typography variant="h1">Welcome to Pognon_ts</Typography>
+      <HomePage/>
     )
   }
 

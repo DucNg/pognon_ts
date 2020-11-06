@@ -10,6 +10,11 @@ import (
 
 // verifyInputPognon check if user input is valid
 func verifyInputPognon(db *xorm.Engine, pognon *data.PognonJSON) error {
+	// Hash musn't be empty
+	if pognon.Pognon.PognonHash == "" {
+		return errors.New("PognonHash can't be empty")
+	}
+
 	// Hash must be unique
 	has, err := db.Get(pognon.Pognon)
 	if err != nil {

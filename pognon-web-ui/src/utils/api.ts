@@ -6,11 +6,11 @@ function createAxiosInstance(): AxiosInstance {
     if (process.env.NODE_ENV === 'development') {
         instance.defaults.baseURL = 'http://localhost:8080';
     }
-    return instance
+    return instance;
 }
 
 export async function fetchData(hash: string): Promise<PognonJSON> {
-    const instance = createAxiosInstance()
+    const instance = createAxiosInstance();
     try {
         const result = await instance.get(`api/pognon/${hash}`);
         return result.data;
@@ -19,10 +19,20 @@ export async function fetchData(hash: string): Promise<PognonJSON> {
     }
 }
 
-export async function postTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<any>> {
-    const instance = createAxiosInstance()
+export async function postPognon(pognon: PognonJSON): Promise<AxiosResponse<PognonJSON>> {
+    const instance = createAxiosInstance();
     try {
-        const result = await instance.post(`api/pognon/${hash}/transaction`,transaction)
+        const result = await instance.post("api/pognon", pognon);
+        return result;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export async function postTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<any>> {
+    const instance = createAxiosInstance();
+    try {
+        const result = await instance.post(`api/pognon/${hash}/transaction`, transaction);
         return result;
     } catch (err) {
         throw err;

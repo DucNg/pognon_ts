@@ -10,7 +10,7 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
             const matchedParticipant = participants.findIndex(participant => 
                 participant.IDPerson === buyer.IDPerson);
             if (matchedParticipant !== -1) {
-                participants[matchedParticipant].Debt -= buyer.Amount;
+                (participants[matchedParticipant].Debt as number) -= buyer.Amount;
             } else {
                 throw new Error("No corresponding participant");
             }
@@ -21,7 +21,7 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
             const matchedParticipant = participants.findIndex(participant => 
                 participant.IDPerson === forWho.IDPerson);
             if (matchedParticipant !== -1) {
-                participants[matchedParticipant].Debt += forWho.Amount;
+                (participants[matchedParticipant].Debt as number) += forWho.Amount;
             } else {
                 throw new Error("No corresponding participant")
             }

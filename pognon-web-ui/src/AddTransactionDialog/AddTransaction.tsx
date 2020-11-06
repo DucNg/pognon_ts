@@ -6,7 +6,7 @@ import { Add } from '@material-ui/icons';
 
 import './AddTransaction.css';
 
-import { Person,Transaction } from '../utils/data';
+import { errorTransaction, Person,Transaction } from '../utils/data';
 import SelectPersons from './SelectPersons';
 import { postTransaction } from '../utils/api';
 
@@ -28,7 +28,7 @@ function AddTransaction({pognonHash, participants}: Props) {
         For: [{IDPerson: -1,Amount: 0}],
         Reason: "",
     })
-    const [error, setError] = useState({
+    const [error, setError] = useState<errorTransaction>({
         status: false,
         type: "",
         msg: "",
@@ -77,7 +77,7 @@ function AddTransaction({pognonHash, participants}: Props) {
         if(isEveryone) {
             const equalPart = totalAmount / participants.length;
             participants.forEach(participant =>
-                transactionVerify.For.push({IDPerson: participant.IDPerson, Amount: equalPart})
+                transactionVerify.For.push({IDPerson: participant.IDPerson as number, Amount: equalPart})
             );
         } else {
             // Make sure buyers amount equals for amount

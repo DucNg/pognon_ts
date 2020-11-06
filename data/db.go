@@ -83,12 +83,27 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 
 // WritePognon write a new Pognon to database
 func WritePognon(engine *xorm.Engine, pognon *PognonJSON) error {
-	_, err := engine.Insert(pognon.Participants)
+	affected, err := engine.Insert(pognon.Participants)
+	if err != nil {
+		return err
+	}
+
+	// Get the inserted persons primary key
+	// TODO: fix this bad design
+	pognon.Participants = &[]Person{}
+	err = engine.Limit(int(affected)).OrderBy("i_d_person DESC").Find(pognon.Participants)
 	if err != nil {
 		return err
 	}
 
 	_, err = engine.Insert(pognon.Pognon)
+	if err != nil {
+		return err
+	}
+
+	// Get the inserted pognon primary key
+	// TODO: fix this bad design
+	_, err = engine.Get(pognon.Pognon)
 	if err != nil {
 		return err
 	}

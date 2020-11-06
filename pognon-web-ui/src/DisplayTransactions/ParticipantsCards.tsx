@@ -19,7 +19,7 @@ function ParticipantsCards({participants}: Props) {
                 >
                 </CardHeader>
                 <CardContent>
-                <Typography variant="body1">Debt: {person.Debt.toFixed(2)}€</Typography>
+                <Typography variant="body1">Debt: {person && person.Debt && person.Debt.toFixed(2)}€</Typography>
                 <Typography variant="body2">Owe 25€ to Lorem</Typography>
                 </CardContent>
                 </Card>
