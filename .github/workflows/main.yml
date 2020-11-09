@@ -33,27 +33,44 @@ jobs:
       - name: test the frontend
         run: |
           cd pognon-web-ui
+          yarn
           yarn test
           
-  build:
+  build and deploy:
     runs-on: ubuntu-latest
+    
+    needs: test
       
     steps:
       - uses: actions/checkout@v2
       
+      - name: Setup SSH
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+      
       - name: Setup Go environment
         uses: actions/setup-go@v2.1.3
+          
+      - name: build the backend
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          go build .
+          scp pognon_ts "$SSH_HOST":~/
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.2
-          
-      - name: build the backend
-        run: go build .
          
-      - name: buld the frontend
+      - name: build the frontend
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           cd pognon-web-ui
+          yarn
           yarn build
+          scp -r build "$SSH_HOST":~/
          
 
   
