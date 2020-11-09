@@ -48,7 +48,7 @@ jobs:
         uses: kielabokkie/ssh-key-and-known-hosts-action@v1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          host: ${{ secrets.SSH_HOST }}
+          ssh-host: ${{ secrets.SSH_HOST }}
       
       - name: Setup Go environment
         uses: actions/setup-go@v2.1.3
