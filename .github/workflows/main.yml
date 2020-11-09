@@ -64,9 +64,9 @@ jobs:
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh "$SSH_HOST" \
-          ln -sr pognon_ts_$GITHUB_SHA pognon_ts \
-          systemctl --user restart pognon
+          ssh -q pognon@"$SSH_HOST" \
+          "ln -srf pognon_ts_$GITHUB_SHA pognon_ts && \
+          systemctl --user restart pognon"
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.2
