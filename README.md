@@ -4,6 +4,19 @@ It's anonymous.
 
 Backend is in Go and uses Echo. Frontend is in React and uses Material-UI.
 
+# Features
+
+* Multiple buyers
+* Multiple persons benefits from the payment
+* Calculate debts
+
+# TODO
+
+* PUT, DELETE
+* "Owe" calculation, "balance"
+* Currencies
+* Choose static files folder
+
 # Installation
 
 ```shell
@@ -18,7 +31,7 @@ cd pognon_ts
 **Required: Go >= 1.15**
 
 ```shell
-go run main.go -allow-cors
+go run . -allow-cors
 ```
 
 Access backend on http://localhost:8080/
@@ -41,12 +54,14 @@ Access frontend on http://localhost:3000/
 
 ## Prod environment
 
+[See CI](https://github.com/DucNg/pognon_ts/blob/master/.github/workflows/main.yml) or manualy with the following:
+
 ### Backend
 
 **Required: Go >= 1.15**
 
 ```shell
-go run main.go
+go run .
 ```
 
 ### Frontend
