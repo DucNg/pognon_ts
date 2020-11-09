@@ -58,7 +58,15 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           go build .
-          scp pognon_ts pognon@"$SSH_HOST":~/
+          scp -q pognon_ts pognon@"$SSH_HOST":~/pognon_ts_$GITHUB_SHA
+          
+      - name: restart systemd unit
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          ssh "$SSH_HOST" \
+          ln -sr pognon_ts_$GITHUB_SHA pognon_ts \
+          systemctl --user restart pognon
       
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.2
@@ -70,7 +78,7 @@ jobs:
           cd pognon-web-ui
           yarn
           yarn build
-          scp -r build pognon@"$SSH_HOST":~/
+          scp -qr build pognon@"$SSH_HOST":~/pognon-web-ui/
          
 
   
