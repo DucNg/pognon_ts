@@ -29,7 +29,7 @@ export async function postPognon(pognon: PognonJSON): Promise<AxiosResponse<Pogn
     }
 }
 
-export async function postTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<any>> {
+export async function postTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<Transaction>> {
     const instance = createAxiosInstance();
     try {
         const result = await instance.post(`api/pognon/${hash}/transaction`, transaction);

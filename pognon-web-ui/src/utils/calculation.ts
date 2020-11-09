@@ -31,5 +31,7 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
             }
         });
     });
-    return participants;
+
+    // Return a new object
+    return [...participants];
 }

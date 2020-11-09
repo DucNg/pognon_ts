@@ -55,7 +55,6 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
             setAmounts({...amounts})
             setError({status: false, type: "", index: undefined, msg: ""});
         } else {
-            console.log(index);
             setError({status: true, type: type, index: index, msg: "Enter a numeric value"});
         }
     }

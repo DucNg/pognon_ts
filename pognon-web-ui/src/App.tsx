@@ -24,8 +24,8 @@ import HomePage from './HomePage';
 
 function App() {
   const [pognonHash, setPognonHash] = useState("");
-  const [participants, setParticipants] = useState<Person[]>(Object);
-  const [transactions, setTransactions] = useState<Transaction[]>(Object);
+  const [participants, setParticipants] = useState<Person[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingStatus, setLoadingStatus] = useState("loading");
   
 
@@ -68,7 +68,13 @@ function App() {
           <Typography variant="h6" className="title">
             Pognon_ts
           </Typography>
-          <AddTransaction pognonHash={pognonHash} participants={participants}/>
+          <AddTransaction 
+            pognonHash={pognonHash} 
+            participants={participants}
+            setParticipants={setParticipants}
+            transactions={transactions}
+            setTransactions={setTransactions}
+          />
         </Toolbar>
       </AppBar>
       <Container className="container">

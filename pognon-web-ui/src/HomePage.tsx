@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Container, Grid, Paper, TextField, Typography } from "@material-ui/core";
+import { Box, Button, Chip, Container, Grid, Paper, Snackbar, TextField, Typography } from "@material-ui/core";
 import React, { ChangeEvent, useState, KeyboardEvent } from "react";
 import { errorTransaction, PognonJSON } from "./utils/data";
 import "./HomePage.css";
@@ -48,7 +48,7 @@ function HomePage() {
 
     const handleCreate = async () => {
         if (pognonJSON.Participants.length === 0) {
-            setError({status: true, msg: "You need at least one participant"})
+            setError({status: true, type: "participant", msg: "You need at least one participant"})
             return
         }
 
@@ -63,7 +63,6 @@ function HomePage() {
 
         try {
             const response = await postPognon(pognonJSON);
-            console.log(response)
             setPognonJSON(response.data);
             setError({status: false, type:"done", msg: ""});
         } catch(err) {
@@ -99,8 +98,8 @@ function HomePage() {
                             value={participantName}
                             onChange={handleChangeParticipantInput}
                             onKeyDown={(event) => handleKeyDown(event)}
-                            error={error.status}
-                            helperText={error.msg}
+                            error={error.type === "participant" && error.status}
+                            helperText={error.type === "participant" && error.msg}
                         />
                     </Grid>
                     <Grid item xs={2}>
@@ -130,9 +129,10 @@ function HomePage() {
                     </Grid>
                 </Grid></Box>
             </Paper>
-                {!error.status && error.type === "done" &&
-                    <Redirect to={{pathname: `/${pognonJSON.Pognon.PognonHash}`}}/>
-                }
+            {!error.status && error.type === "done" &&
+                <Redirect to={{pathname: `/${pognonJSON.Pognon.PognonHash}`}}/>
+            }
+            <Snackbar open={error.status} message={`Error: ${error.msg}`} color="secondary"/>
         </Container>
     )
 }

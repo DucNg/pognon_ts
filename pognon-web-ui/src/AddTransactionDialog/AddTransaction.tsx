@@ -6,13 +6,17 @@ import { Add } from '@material-ui/icons';
 
 import './AddTransaction.css';
 
-import { errorTransaction, Person,Transaction } from '../utils/data';
+import { errorTransaction, Person, Transaction } from '../utils/data';
 import SelectPersons from './SelectPersons';
 import { postTransaction } from '../utils/api';
+import { calcDebt } from '../utils/calculation';
 
 interface Props {
     pognonHash: string,
     participants: Person[],
+    setParticipants: React.Dispatch<React.SetStateAction<Person[]>>
+    transactions: Transaction[],
+    setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>
 }
 
 interface item {
@@ -20,7 +24,7 @@ interface item {
     for: string[],
 }
 
-function AddTransaction({pognonHash, participants}: Props) {
+function AddTransaction({pognonHash, participants, setParticipants, transactions, setTransactions}: Props) {
     const [open, setOpen] = useState(false);
     const [isEveryone, setIsEveryone] = useState(true)
     const [transaction, setTransaction] = useState<Transaction>({
@@ -99,9 +103,12 @@ function AddTransaction({pognonHash, participants}: Props) {
                     Reason: "",
                 });
                 handleCloseDialog();
-                console.log(res);
+                setTransactions([...transactions, res.data]);
+                const newDebts = calcDebt(participants,[...transactions, res.data]);
+                setParticipants(newDebts);
             } catch (err) {
-                setError({status: true, type: "", msg: `Backend error ${err}`})
+                console.log(err);
+                setError({status: true, type: "", msg: `Backend error ${err}`});
             }
         }
     };
