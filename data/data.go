@@ -9,8 +9,9 @@ import (
 
 // Person is a participant to a pognon
 type Person struct {
-	IDPerson uint16 `xorm:"pk SERIAL"`
-	Name     string
+	IDPerson   uint16 `xorm:"pk SERIAL"`
+	Name       string
+	PognonHash string `xorm:"INDEX DEFAULT ''" json:"-"`
 }
 
 // Purchase is an amount payed by someone or an amount used by someone
@@ -35,12 +36,6 @@ type Transaction struct {
 type Pognon struct {
 	IDPognon   uint16 `xorm:"pk SERIAL" json:"-"`
 	PognonHash string `xorm:"unique index"` // Random hash to identify pognon
-}
-
-// Participants is a list of participants to a pognon
-type Participants struct {
-	IDPognon uint16
-	IDPerson uint16
 }
 
 // PognonJSON is a structured response to a pongon request

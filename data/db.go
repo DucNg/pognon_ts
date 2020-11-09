@@ -14,7 +14,7 @@ func GetEngine(databaseFile string) (*xorm.Engine, error) {
 		return nil, err
 	}
 
-	err = engine.Sync2(new(Transaction), new(Pognon), new(Person), new(Participants))
+	err = engine.Sync2(new(Transaction), new(Pognon), new(Person))
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +49,9 @@ func GetTransactions(engine *xorm.Engine, hash string) (*[]Transaction, error) {
 }
 
 // GetParticipants given a IDPognon get list of participants
-func GetParticipants(engine *xorm.Engine, idpognon uint16) (*[]Person, error) {
+func GetParticipants(engine *xorm.Engine, hash string) (*[]Person, error) {
 	par := []Person{}
-	err := engine.Find(&par, &Participants{IDPognon: idpognon})
+	err := engine.Where("pognon_hash = ?", hash).Find(&par)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 	if err != nil {
 		return nil, err
 	}
-	par, err := GetParticipants(engine, p.IDPognon)
+	par, err := GetParticipants(engine, hash)
 	if err != nil {
 		return nil, err
 	}
@@ -83,15 +83,15 @@ func GetPognonJSON(engine *xorm.Engine, hash string) (*PognonJSON, error) {
 
 // WritePognon write a new Pognon to database
 func WritePognon(engine *xorm.Engine, pognon *PognonJSON) error {
-	affected, err := engine.Insert(pognon.Participants)
-	if err != nil {
-		return err
+	var participants []Person
+	for _, person := range *pognon.Participants {
+		participants = append(participants, Person{
+			Name:       person.Name,
+			PognonHash: pognon.Pognon.PognonHash,
+		})
 	}
 
-	// Get the inserted persons primary key
-	// TODO: fix this bad design
-	pognon.Participants = &[]Person{}
-	err = engine.Limit(int(affected)).OrderBy("i_d_person DESC").Find(pognon.Participants)
+	_, err := engine.Insert(&participants)
 	if err != nil {
 		return err
 	}
@@ -100,23 +100,6 @@ func WritePognon(engine *xorm.Engine, pognon *PognonJSON) error {
 	if err != nil {
 		return err
 	}
-
-	// Get the inserted pognon primary key
-	// TODO: fix this bad design
-	_, err = engine.Get(pognon.Pognon)
-	if err != nil {
-		return err
-	}
-
-	// Link persons and pognon
-	var participants []Participants
-	for _, person := range *pognon.Participants {
-		participants = append(participants, Participants{
-			pognon.Pognon.IDPognon,
-			person.IDPerson,
-		})
-	}
-	_, err = engine.Insert(&participants)
 
 	return err
 }

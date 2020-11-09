@@ -21,13 +21,6 @@ func TestDatabase(t *testing.T) {
 	}
 	defer engine.Close()
 
-	// Create a some persons
-	persons := []Person{{Name: "a"}, {Name: "b"}, {Name: "c"}, {Name: "d"}}
-	_, err = engine.Insert(persons)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	// Create a pognon with a unique hash
 	p := Pognon{IDPognon: 1, PognonHash: "abcdefgh"}
 	_, err = engine.Insert(p)
@@ -35,13 +28,12 @@ func TestDatabase(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Link pognon and persons
-	participants := []Participants{{1, 1}, {1, 2}, {1, 3}, {1, 4}}
-	_, err = engine.Insert(participants)
+	// Create a some persons
+	persons := []Person{{Name: "a", PognonHash: "abcdefgh"}, {Name: "b", PognonHash: "abcdefgh"}, {Name: "c", PognonHash: "abcdefgh"}, {Name: "d", PognonHash: "abcdefgh"}}
+	_, err = engine.Insert(persons)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log("Wrote pognon to database")
 
 	t1 := Transaction{
 		PognonHash: "abcdefgh",

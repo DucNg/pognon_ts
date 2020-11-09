@@ -11,7 +11,7 @@ function ParticipantsCards({participants}: Props) {
         <Box mb={2}>
         <Grid container spacing={3}>
         {participants[0] && participants.map((person: Person) => (
-            <Grid key={person.Name} item xs={3}>
+            <Grid key={person.IDPerson} item xs={3}>
                 <Card key={person.Name}>
                 <CardHeader key={person.Name}
                 avatar={<Avatar aria-label="person">{person.Name[0]}</Avatar>}
