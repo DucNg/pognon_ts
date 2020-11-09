@@ -4,7 +4,7 @@ import { errorTransaction, PognonJSON } from "./utils/data";
 import "./HomePage.css";
 import { postPognon } from "./utils/api";
 import { encode } from "./utils/base64-url";
-import { Redirect, BrowserRouter as Router } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 function HomePage() {
     const [pognonJSON, setPognonJSON] = useState<PognonJSON>({
@@ -130,11 +130,9 @@ function HomePage() {
                     </Grid>
                 </Grid></Box>
             </Paper>
-            <Router>
                 {!error.status && error.type === "done" &&
                     <Redirect to={{pathname: `/${pognonJSON.Pognon.PognonHash}`}}/>
                 }
-            </Router>
         </Container>
     )
 }
