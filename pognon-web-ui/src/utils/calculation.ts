@@ -4,6 +4,10 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
     // Initialize debt
     participants.forEach(participant => participant.Debt = 0);
 
+    if (transactions === null) {
+        return participants;
+    }
+
     transactions.forEach(transaction => {
         // Calculate negative debt (sum of payed amount)
         transaction.Buyers.forEach(buyer => {
