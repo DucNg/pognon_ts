@@ -1,4 +1,4 @@
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
+import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@material-ui/core";
 import moment from "moment";
 import React from "react";
 import { columns, Person, Transaction } from "../utils/data";
@@ -44,8 +44,12 @@ function TableTransaction({transactions, participants}: Props) {
                             matchName(forWho.IDPerson)).join(", ")}</TableCell>
                         <TableCell key={transaction.IDTransaction + "reason"}>
                           {transaction.Reason}</TableCell>
+                        
+                        <Tooltip title={moment(transaction.CreatedAt).calendar()} placement="left" >
                         <TableCell key={transaction.IDTransaction + "date"}>
-                          {moment(transaction.CreatedAt).fromNow()}</TableCell>
+                          {moment(transaction.CreatedAt).format('L')}
+                        </TableCell>
+                        </Tooltip>
                       </TableRow>
                     ))}
                   </TableBody>
