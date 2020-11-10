@@ -103,6 +103,8 @@ func main() {
 		"Allow CORS for test purposes. Allow the usage of the build in node "+
 			"server to test frontend.")
 	port := flag.String("port", ":8080", "Specify bind address")
+	staticFolder := flag.String("staticFolder", "./pognon-web-ui/build",
+		"Static folder for frontend files to serve.")
 	flag.Parse()
 
 	log.SetFlags(log.Lshortfile) // Enable line number on error
@@ -118,7 +120,7 @@ func main() {
 
 	// Serve frontend files staticly
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:  "./pognon-web-ui/build",
+		Root:  *staticFolder,
 		HTML5: true,
 	}))
 

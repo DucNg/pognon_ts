@@ -15,7 +15,6 @@ Backend is in Go and uses Echo. Frontend is in React and uses Material-UI.
 * PUT, DELETE
 * "Owe" calculation, "balance"
 * Currencies
-* Choose static files folder
 
 # Installation
 
