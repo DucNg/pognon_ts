@@ -103,8 +103,8 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
                     Reason: "",
                 });
                 handleCloseDialog();
-                setTransactions([...transactions, res.data]);
-                const newDebts = calcDebt(participants,[...transactions, res.data]);
+                setTransactions([res.data,...transactions]);
+                const newDebts = calcDebt(participants,[res.data,...transactions]);
                 setParticipants(newDebts);
             } catch (err) {
                 console.log(err);

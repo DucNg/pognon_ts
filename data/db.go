@@ -38,7 +38,7 @@ func GetPognon(engine *xorm.Engine, hash string) (*Pognon, error) {
 // GetTransactions for a given pognon hash get the corresponding transactions
 func GetTransactions(engine *xorm.Engine, hash string) (*[]Transaction, error) {
 	t := []Transaction{}
-	err := engine.Find(&t, &Transaction{PognonHash: hash})
+	err := engine.OrderBy("created_at DESC").Find(&t, &Transaction{PognonHash: hash})
 	if err != nil {
 		return nil, err
 	}
