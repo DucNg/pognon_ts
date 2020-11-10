@@ -66,7 +66,11 @@ function HomePage() {
             setPognonJSON(response.data);
             setError({status: false, type:"done", msg: ""});
         } catch(err) {
-            setError({status: true, msg: `${err}`});
+            if (err.response) {
+                setError({status: true, type: "", msg: `${err.response.data}`});
+            } else {
+                setError({status: true, type: "", msg: `Backend error ${err}`});
+            }
         }
     }
 

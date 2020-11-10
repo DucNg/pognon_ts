@@ -107,8 +107,11 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
                 const newDebts = calcDebt(participants,[res.data,...transactions]);
                 setParticipants(newDebts);
             } catch (err) {
-                console.log(err);
-                setError({status: true, type: "", msg: `Backend error ${err}`});
+                if (err.response) {
+                    setError({status: true, type: "", msg: `${err.response.data}`});
+                } else {
+                    setError({status: true, type: "", msg: `Backend error ${err}`});
+                }
             }
         }
     };
