@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from 'react';
-import { TextField, MenuItem, InputLabel, Grid, Select, IconButton } 
+import { TextField, MenuItem, Grid, Select, IconButton } 
     from '@material-ui/core'
 import { Delete, ExpandMore } from '@material-ui/icons'
 import { Person, Purchase, Transaction, errorTransaction } from '../utils/data';
@@ -41,8 +41,9 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
     const removeItem = (index: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const { name } = event.currentTarget;
         transaction[name as keyof item].splice(index,1);
-        const newObject = {...transaction};
-        setTransaction(newObject);
+        setTransaction({...transaction});
+        amounts[name as keyof item].splice(index,1);
+        setAmounts({...amounts})
     }
 
     const handleChangeAmount = (index: number, type: keyof item, event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -74,13 +75,12 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
         {transaction[type].map((_,index) => (
             <Grid container key={"grid-container-"+type+index} alignItems="center" wrap="nowrap" spacing={3}>
                 <Grid item key={"grid-item-select-"+type+"-"+index} className="grid-item" xs={3}>
-                    <InputLabel key={"label-"+type+"-"+index} id={"select-"+type+"-"+index}>{type} {index}</InputLabel>
                     <Select
                         labelId={"select-"+type+index}
                         id={"select-"+type+"-"+index}
                         name={type}
                         key={"select-"+type+"-"+index}
-                        value={transaction[type][index].IDPerson === -1 ? "" : 
+                        value={
                             transaction[type][index].IDPerson}
                         onChange={(event) => handleChangeItems(index,event)}
                         error={
@@ -88,6 +88,7 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
                             ? error.status : false
                         }
                     >
+                        <MenuItem key={`menu-placeholder-${index}`} value={-1}>Nobody</MenuItem>
                         {participants[0] && participants.map(participant =>
                         <MenuItem key={"menu-"+index+"-"+participant.IDPerson} 
                             value={participant.IDPerson}>{participant.Name}</MenuItem>
@@ -101,8 +102,8 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
                         name={type}
                         label="Amount"
                         type="text"
-                        key={`textField-${type}+-${index}`}
-                        value={amounts[type][index]}
+                        key={`textField-${type}-${index}`}
+                        value={amounts[type][index] || ""}
                         onChange={(event) => handleChangeAmount(index, type, event)}
                         fullWidth
                         error={

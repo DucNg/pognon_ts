@@ -48,6 +48,8 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
 
     const toggleEveryone = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsEveryone(event.target.checked)
+        transaction.For = [{IDPerson: -1,Amount: 0}]; // Restore default value
+        setTransaction({...transaction});
     }
 
     const handleReason = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
