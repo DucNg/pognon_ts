@@ -27,10 +27,13 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
             if (matchedParticipant !== -1) {
                 (participants[matchedParticipant].Debt as number) += forWho.Amount;
             } else {
-                throw new Error("No corresponding participant")
+                throw new Error("No corresponding participant");
             }
         });
     });
+
+    // Make persons with the biggest debt first
+    participants.sort((personA, personB) => (personB.Debt as number) - (personA.Debt as number));
 
     // Return a new object
     return [...participants];
