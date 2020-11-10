@@ -67,7 +67,11 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
             return
         }
 
-        // TODO: first for cannot be empty if everyone is unchecked
+        // First for cannot be empty if everyone is unchecked
+        if(!isEveryone && transactionVerify.For[0].IDPerson === -1) {
+            setError({status: true, type: "For", msg: "You need at least one payee"});
+            return
+        }
 
         // Remove last entry if empty
         if(transactionVerify.Buyers[transactionVerify.Buyers.length-1].IDPerson === -1) {
@@ -96,24 +100,23 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
         }
 
         // Send POST request to backend
-        if (!error.status) {
-            try {
-                const res = await postTransaction(pognonHash, transactionVerify);
-                setTransaction({
-                    Buyers: [{IDPerson: -1,Amount: 0}],
-                    For: [{IDPerson: -1,Amount: 0}],
-                    Reason: "",
-                });
-                handleCloseDialog();
-                setTransactions([res.data,...transactions]);
-                const newDebts = calcDebt(participants,[res.data,...transactions]);
-                setParticipants(newDebts);
-            } catch (err) {
-                if (err.response) {
-                    setError({status: true, type: "", msg: `${err.response.data}`});
-                } else {
-                    setError({status: true, type: "", msg: `Backend error ${err}`});
-                }
+        try {
+            const res = await postTransaction(pognonHash, transactionVerify);
+            setTransaction({
+                Buyers: [{IDPerson: -1,Amount: 0}],
+                For: [{IDPerson: -1,Amount: 0}],
+                Reason: "",
+            });
+            handleCloseDialog();
+            setTransactions([res.data,...transactions]);
+            const newDebts = calcDebt(participants,[res.data,...transactions]);
+            setParticipants(newDebts);
+            setError({status: false, type: "", msg: ""});
+        } catch (err) {
+            if (err.response) {
+                setError({status: true, type: "", msg: `${err.response.data}`});
+            } else {
+                setError({status: true, type: "", msg: `Backend error ${err}`});
             }
         }
     };

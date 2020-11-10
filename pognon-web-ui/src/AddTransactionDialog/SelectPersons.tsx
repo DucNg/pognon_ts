@@ -80,15 +80,14 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
                         id={"select-"+type+"-"+index}
                         name={type}
                         key={"select-"+type+"-"+index}
-                        value={
-                            transaction[type][index].IDPerson}
+                        value={transaction[type][index].IDPerson}
                         onChange={(event) => handleChangeItems(index,event)}
                         error={
                             correspondingError(error, type, index)
                             ? error.status : false
                         }
                     >
-                        <MenuItem key={`menu-placeholder-${index}`} value={-1}>Nobody</MenuItem>
+                        <MenuItem key={`menu-placeholder-${index}`} disabled={true} value={-1}><em>Nobody</em></MenuItem>
                         {participants[0] && participants.map(participant =>
                         <MenuItem key={"menu-"+index+"-"+participant.IDPerson} 
                             value={participant.IDPerson}>{participant.Name}</MenuItem>
