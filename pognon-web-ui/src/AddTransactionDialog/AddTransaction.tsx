@@ -77,7 +77,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
 
         // Add equal parts for everyone if everyone is checked
         const totalAmount = transactionVerify.Buyers.reduce((prevValue, buyer) => 
-                prevValue = buyer.Amount, 0);
+                prevValue + buyer.Amount, 0);
         if(isEveryone) {
             const equalPart = totalAmount / participants.length;
             participants.forEach(participant =>
@@ -86,7 +86,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
         } else {
             // Make sure buyers amount equals for amount
             const totalAmountFor = transactionVerify.For.reduce((prevValue, forWho) =>
-                prevValue = forWho.Amount, 0);
+                prevValue + forWho.Amount, 0);
             if(totalAmount !== totalAmountFor) {
                 setError({status: true, type: "For", msg: "Sums aren't equals"});
                 return
