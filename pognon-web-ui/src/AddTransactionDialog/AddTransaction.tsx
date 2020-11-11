@@ -24,14 +24,16 @@ interface item {
     for: string[],
 }
 
+const resetTransaction = () => ({
+    Buyers: [{IDPerson: -1,Amount: 0, Rest: false}],
+    For: [{IDPerson: -1,Amount: 0, Rest: true}],
+    Reason: "",
+})
+
 function AddTransaction({pognonHash, participants, setParticipants, transactions, setTransactions}: Props) {
     const [open, setOpen] = useState(false);
     const [isEveryone, setIsEveryone] = useState(true)
-    const [transaction, setTransaction] = useState<Transaction>({
-        Buyers: [{IDPerson: -1,Amount: 0}],
-        For: [{IDPerson: -1,Amount: 0}],
-        Reason: "",
-    })
+    const [transaction, setTransaction] = useState<Transaction>(resetTransaction())
     const [error, setError] = useState<errorTransaction>({
         status: false,
         type: "",
@@ -48,7 +50,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
 
     const toggleEveryone = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsEveryone(event.target.checked)
-        transaction.For = [{IDPerson: -1,Amount: 0}]; // Restore default value
+        transaction.For = [{IDPerson: -1,Amount: 0, Rest: true}]; // Restore default value
         setTransaction({...transaction});
     }
 
@@ -82,7 +84,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
         }
 
         // Add equal parts for everyone if everyone is checked
-        const totalAmount = transactionVerify.Buyers.reduce((prevValue, buyer) => 
+/*         const totalAmount = transactionVerify.Buyers.reduce((prevValue, buyer) => 
                 prevValue + buyer.Amount, 0);
         if(isEveryone) {
             const equalPart = totalAmount / participants.length;
@@ -97,16 +99,12 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
                 setError({status: true, type: "For", msg: "Sums aren't equals"});
                 return
             }
-        }
+        } */
 
         // Send POST request to backend
         try {
             const res = await postTransaction(pognonHash, transactionVerify);
-            setTransaction({
-                Buyers: [{IDPerson: -1,Amount: 0}],
-                For: [{IDPerson: -1,Amount: 0}],
-                Reason: "",
-            });
+            setTransaction(resetTransaction());
             handleCloseDialog();
             setTransactions([res.data,...transactions]);
             const newDebts = calcDebt(participants,[res.data,...transactions]);

@@ -6,7 +6,8 @@ export interface Person {
 
 export interface Purchase {
 	IDPerson: number;
-	Amount: number;
+    Amount: number;
+    Rest: boolean;
 }
 
 // Transaction is a money transaction for a Pognon
