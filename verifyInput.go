@@ -43,7 +43,7 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 		return errors.New("You need at least one for")
 	}
 
-	// Sum buyers and for must be equal
+	// Total amount for cannot exceed total amount buyers
 	var totalAmountBuyers, totalAmountFor float32
 	for _, purchase := range transaction.Buyers {
 		totalAmountBuyers += purchase.Amount
@@ -51,8 +51,8 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 	for _, purchase := range transaction.For {
 		totalAmountFor += purchase.Amount
 	}
-	if totalAmountBuyers != totalAmountFor {
-		return errors.New("Sum buyers and for must be equals")
+	if totalAmountFor > totalAmountBuyers {
+		return errors.New("Total amount for cannot exceed total amount buyers")
 	}
 
 	// Every IDPerson must exist in DB
