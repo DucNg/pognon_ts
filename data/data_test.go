@@ -37,8 +37,8 @@ func TestDatabase(t *testing.T) {
 
 	t1 := Transaction{
 		PognonHash: "abcdefgh",
-		Buyers:     []Purchase{{1, 10.25}},
-		For:        []Purchase{{1, 5}, {2, 3}, {3, 2.25}},
+		Buyers:     []Purchase{{1, 10.25, false}},
+		For:        []Purchase{{1, 5, false}, {2, 3, false}, {3, 2.25, false}},
 		Reason:     "love",
 	}
 	_, err = engine.Insert(t1)
@@ -57,8 +57,8 @@ func TestDatabase(t *testing.T) {
 
 	t2 := Transaction{
 		PognonHash: "abcdefgh",
-		Buyers:     []Purchase{{1, 5.4}},
-		For:        []Purchase{{1, 1.8}, {2, 1.8}, {3, 1.8}},
+		Buyers:     []Purchase{{1, 5.4, false}},
+		For:        []Purchase{{1, 0, true}, {2, 0, true}, {3, 0, true}},
 		Reason:     "bus",
 	}
 	_, err = engine.Insert(t2)
