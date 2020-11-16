@@ -45,13 +45,19 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 
 	// Total amount for cannot exceed total amount buyers
 	var totalAmountBuyers, totalAmountFor float32
+	var doesHaveRest bool
 	for _, purchase := range transaction.Buyers {
 		totalAmountBuyers += purchase.Amount
 	}
 	for _, purchase := range transaction.For {
 		totalAmountFor += purchase.Amount
+		doesHaveRest = doesHaveRest || purchase.Rest
 	}
 	if totalAmountFor > totalAmountBuyers {
+		return errors.New("Total amount for cannot exceed total amount buyers")
+	}
+	// If every amounts are specify sum for must equal sum buyers
+	if !doesHaveRest && totalAmountBuyers != totalAmountFor {
 		return errors.New("Total amount for cannot exceed total amount buyers")
 	}
 

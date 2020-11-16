@@ -83,6 +83,12 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
             transactionVerify.For.pop();
         }
 
+        // Calculate totals, usefull to make verifications
+        const totalAmountBuyers = transactionVerify.Buyers.reduce((prevValue, buyer) => 
+                prevValue + buyer.Amount, 0);
+        const totalAmountFor = transactionVerify.For.reduce((prevValue, forWho) =>
+                prevValue + forWho.Amount, 0);
+
         // Add equal parts for everyone if everyone is checked
         if(isEveryone) {
             participants.forEach(participant =>
@@ -91,12 +97,14 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
                     Amount: 0, 
                     Rest: true})
             );
+        } else if(!transactionVerify.For.find(purchase => purchase.Rest === true)) {
+            // If every amount for are specify, the total must equal the total amount brought
+            if(totalAmountBuyers !== totalAmountFor) {
+                setError({status: true, type: "For", msg: "Sums aren't equals"});
+                return
+            }
         } else {
-            // Make sure for amount doesn't exceed buyers amount
-            const totalAmountBuyers = transactionVerify.Buyers.reduce((prevValue, buyer) => 
-                prevValue + buyer.Amount, 0);
-            const totalAmountFor = transactionVerify.For.reduce((prevValue, forWho) =>
-                prevValue + forWho.Amount, 0);
+            // Make sure for amount doesn't exceed buyers amount           
             if(totalAmountFor > totalAmountBuyers) {
                 setError({status: true, type: "For", msg: "Received amount cannot exceed paid amount"});
                 return
