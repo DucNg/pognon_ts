@@ -24,14 +24,16 @@ interface item {
     for: string[],
 }
 
+const resetTransaction = () => ({
+    Buyers: [{IDPerson: -1,Amount: 0, Rest: false}],
+    For: [{IDPerson: -1,Amount: 0, Rest: true}],
+    Reason: "",
+})
+
 function AddTransaction({pognonHash, participants, setParticipants, transactions, setTransactions}: Props) {
     const [open, setOpen] = useState(false);
     const [isEveryone, setIsEveryone] = useState(true)
-    const [transaction, setTransaction] = useState<Transaction>({
-        Buyers: [{IDPerson: -1,Amount: 0}],
-        For: [{IDPerson: -1,Amount: 0}],
-        Reason: "",
-    })
+    const [transaction, setTransaction] = useState<Transaction>(resetTransaction())
     const [error, setError] = useState<errorTransaction>({
         status: false,
         type: "",
@@ -48,7 +50,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
 
     const toggleEveryone = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsEveryone(event.target.checked)
-        transaction.For = [{IDPerson: -1,Amount: 0}]; // Restore default value
+        transaction.For = [{IDPerson: -1,Amount: 0, Rest: true}]; // Restore default value
         setTransaction({...transaction});
     }
 
@@ -81,20 +83,30 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
             transactionVerify.For.pop();
         }
 
-        // Add equal parts for everyone if everyone is checked
-        const totalAmount = transactionVerify.Buyers.reduce((prevValue, buyer) => 
+        // Calculate totals, usefull to make verifications
+        const totalAmountBuyers = transactionVerify.Buyers.reduce((prevValue, buyer) => 
                 prevValue + buyer.Amount, 0);
-        if(isEveryone) {
-            const equalPart = totalAmount / participants.length;
-            participants.forEach(participant =>
-                transactionVerify.For.push({IDPerson: participant.IDPerson as number, Amount: equalPart})
-            );
-        } else {
-            // Make sure buyers amount equals for amount
-            const totalAmountFor = transactionVerify.For.reduce((prevValue, forWho) =>
+        const totalAmountFor = transactionVerify.For.reduce((prevValue, forWho) =>
                 prevValue + forWho.Amount, 0);
-            if(totalAmount !== totalAmountFor) {
+
+        // Add equal parts for everyone if everyone is checked
+        if(isEveryone) {
+            participants.forEach(participant =>
+                transactionVerify.For.push({
+                    IDPerson: participant.IDPerson as number, 
+                    Amount: 0, 
+                    Rest: true})
+            );
+        } else if(!transactionVerify.For.find(purchase => purchase.Rest === true)) {
+            // If every amount for are specify, the total must equal the total amount brought
+            if(totalAmountBuyers !== totalAmountFor) {
                 setError({status: true, type: "For", msg: "Sums aren't equals"});
+                return
+            }
+        } else {
+            // Make sure for amount doesn't exceed buyers amount           
+            if(totalAmountFor > totalAmountBuyers) {
+                setError({status: true, type: "For", msg: "Received amount cannot exceed paid amount"});
                 return
             }
         }
@@ -102,11 +114,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
         // Send POST request to backend
         try {
             const res = await postTransaction(pognonHash, transactionVerify);
-            setTransaction({
-                Buyers: [{IDPerson: -1,Amount: 0}],
-                For: [{IDPerson: -1,Amount: 0}],
-                Reason: "",
-            });
+            setTransaction(resetTransaction());
             handleCloseDialog();
             setTransactions([res.data,...transactions]);
             const newDebts = calcDebt(participants,[res.data,...transactions]);

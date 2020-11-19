@@ -18,6 +18,7 @@ type Person struct {
 type Purchase struct {
 	IDPerson uint16
 	Amount   float32
+	Rest     bool
 }
 
 // Transaction is a money transaction for a Pognon

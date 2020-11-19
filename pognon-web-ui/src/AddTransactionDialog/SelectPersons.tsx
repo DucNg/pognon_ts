@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from 'react';
-import { TextField, MenuItem, Grid, Select, IconButton } 
+import { TextField, MenuItem, Grid, Select, IconButton, FormControlLabel, Switch } 
     from '@material-ui/core'
 import { Delete, ExpandMore } from '@material-ui/icons'
 import { Person, Purchase, Transaction, errorTransaction } from '../utils/data';
@@ -30,7 +30,7 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
         let newArray: Purchase[] = [];
         if((type === "For" || transaction.Buyers.length > 1) &&
             index === transaction[name].length-1) {
-                newArray = [...transaction[name],{IDPerson: -1, Amount: 0} as Purchase];
+                newArray = [...transaction[name],{IDPerson: -1, Amount: 0, Rest: (type === "For")}];
         } else {
             newArray = transaction[name].slice();
         }
@@ -44,6 +44,11 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
         setTransaction({...transaction});
         amounts[name as keyof item].splice(index,1);
         setAmounts({...amounts})
+    }
+
+    const handleToggleRest = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        transaction.For[index].Rest = event.target.checked;
+        setTransaction({...transaction})
     }
 
     const handleChangeAmount = (index: number, type: keyof item, event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -73,8 +78,8 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
     return(
         <div>
         {transaction[type].map((_,index) => (
-            <Grid container key={"grid-container-"+type+index} alignItems="center" wrap="nowrap" spacing={3}>
-                <Grid item key={"grid-item-select-"+type+"-"+index} className="grid-item" xs={3}>
+            <Grid container key={"grid-container-"+type+index} alignItems="center" wrap="nowrap" spacing={1}>
+                <Grid item key={"grid-item-select-"+type+"-"+index} className="grid-item" xs={2}>
                     <Select
                         labelId={"select-"+type+index}
                         id={"select-"+type+"-"+index}
@@ -94,7 +99,7 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
                         )}
                     </Select>
                 </Grid>
-                <Grid key={"grid-item-text-"+index} item xs={7}>
+                <Grid key={"grid-item-text-"+index} item xs={5}>
                     <TextField
                         margin="dense"
                         id={`amount-${type}-${index}`}
@@ -104,7 +109,9 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
                         key={`textField-${type}-${index}`}
                         value={amounts[type][index] || ""}
                         onChange={(event) => handleChangeAmount(index, type, event)}
-                        fullWidth
+                        // fullWidth
+                        disabled={(transaction[type][index].IDPerson === -1) ||
+                            (type === "For" && transaction.For[index].Rest)}
                         error={
                             correspondingError(error, type, index)
                             ? error.status : false
@@ -115,6 +122,23 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
                         }
                     />
                 </Grid>
+                {type === "For" &&
+                <Grid key={`grid-item-switch-${index}`} item xs={3}>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={transaction.For[index].Rest}
+                                onChange={(event) => handleToggleRest(index, event)}
+                                name={type}
+                                disabled={transaction.For[index].IDPerson === -1}
+                                color="primary"
+                                size="small"
+                            />
+                        }
+                        label="a share"
+                    />
+                </Grid>
+                }
                 <Grid key={"grid-item-button-"+index} item xs={2}>
                     {index === 0 && type === "Buyers" &&
                     <IconButton onClick={morePersons} aria-label="more"
