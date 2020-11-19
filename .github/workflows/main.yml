@@ -49,6 +49,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           ssh-host: ${{ secrets.SSH_HOST }}
+          ssh-port: ${{ secrets.PORT }}
       
       - name: Setup Go environment
         uses: actions/setup-go@v2.1.3
@@ -56,15 +57,17 @@ jobs:
       - name: build the backend
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          PORT: ${{ secrets.PORT }}
         run: |
           go build .
-          scp -q pognon_ts pognon@"$SSH_HOST":~/pognon_ts_$GITHUB_SHA
+          scp -P $PORT -q pognon_ts pognon@"$SSH_HOST":~/pognon_ts_$GITHUB_SHA
           
       - name: restart systemd unit
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          PORT: ${{ secrets.PORT }}
         run: |
-          ssh -q pognon@"$SSH_HOST" \
+          ssh -p $PORT -q pognon@"$SSH_HOST" \
           "ln -srf pognon_ts_$GITHUB_SHA pognon_ts && \
           systemctl --user restart pognon"
       
@@ -74,11 +77,12 @@ jobs:
       - name: build the frontend
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          PORT: ${{ secrets.PORT }}
         run: |
           cd pognon-web-ui
           yarn
           yarn build
-          scp -qr build pognon@"$SSH_HOST":~/pognon-web-ui/
+          scp -P $PORT -qr build pognon@"$SSH_HOST":~/pognon-web-ui/
          
 
   
