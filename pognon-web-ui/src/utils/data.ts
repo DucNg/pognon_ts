@@ -68,3 +68,9 @@ export interface errorTransaction {
     index?: number;
     msg: string;
 }
+
+export interface owe {
+    who: string; // Who owe money
+    amount: number; // How much
+    toWho: string; // To who he owe the money to
+}

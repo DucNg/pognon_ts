@@ -1,5 +1,7 @@
-import { Person, Transaction } from './data';
+import { owe, Person, Transaction } from './data';
 
+
+// Calculate debt for each participants
 export function calcDebt(participants: Person[], transactions: Transaction[]): Person[] {
     // Initialize debt
     participants.forEach(participant => participant.Debt = 0);
@@ -63,4 +65,61 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
 
     // Return a new object
     return [...participants];
+}
+
+// Calculate who needs to give money to who
+export function calcOwe(participants: Person[]): owe[] {
+    if (!participants[0].Debt) {
+        throw new Error("Calculate debt first");
+    }
+    
+    const owe: owe[] = [];
+
+    // Participants should already be sorted by debt
+    // We want the ones with biggest debts to refund the one with the smallest one
+    participants.forEach(participantPosDebt => {
+        if (participantPosDebt.Debt as number > 0) {
+            let debtToBalance = participantPosDebt.Debt as number;
+            
+            // Give the money to a person who has a negative debt, starting from the end
+            participants.slice().reverse().forEach(participantNegDebt => {
+                if (debtToBalance === 0) return
+
+                if (participantNegDebt.Debt as number < 0){
+                
+                    if (participantNegDebt.Debt as number + debtToBalance > 0) {
+                        // Cannot give all the money at once
+                        // Give the maximum amount and save the rest
+                        // for another person
+                        owe.push({
+                            who: participantPosDebt.Name,
+                            amount: Math.abs(participantNegDebt.Debt as number),
+                            toWho: participantNegDebt.Name
+                        })
+
+                        debtToBalance = (debtToBalance + (participantNegDebt.Debt as number));
+                        participantPosDebt.Debt = debtToBalance;
+                        participantNegDebt.Debt = 0;
+                    }
+                
+                    else {
+                        // Give all the money at once
+                        owe.push({
+                            who: participantPosDebt.Name,
+                            amount: debtToBalance,
+                            toWho: participantNegDebt.Name
+                        })
+
+                        participantPosDebt.Debt = 0;
+                        participantNegDebt.Debt = (participantNegDebt.Debt as number) + debtToBalance;
+                        debtToBalance = 0;
+                    }
+                
+                }
+
+            })
+        }
+    })
+
+    return owe;
 }
