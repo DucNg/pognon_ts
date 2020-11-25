@@ -1,7 +1,13 @@
+export interface Owe {
+    amount: number; // How much
+    toWho: string; // To who he owe the money to
+}
+
 export interface Person {
-    IDPerson?: number
-    Name: string
-    Debt?: number
+    IDPerson?: number;
+    Name: string;
+    Debt?: number;
+    Owe?: Owe[]; // A person can owe money to a list of persons
 }
 
 export interface Purchase {
@@ -67,10 +73,4 @@ export interface errorTransaction {
     type?: string;
     index?: number;
     msg: string;
-}
-
-export interface owe {
-    who: string; // Who owe money
-    amount: number; // How much
-    toWho: string; // To who he owe the money to
 }

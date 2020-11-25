@@ -1,4 +1,4 @@
-import { owe, Person, Transaction } from './data';
+import { Owe, Person, Transaction } from './data';
 
 
 // Calculate debt for each participants
@@ -63,55 +63,60 @@ export function calcDebt(participants: Person[], transactions: Transaction[]): P
     // Make persons with the biggest debt first
     participants.sort((personA, personB) => (personB.Debt as number) - (personA.Debt as number));
 
+    // Calculate balance
+    calcOwe(participants);
+
     // Return a new object
     return [...participants];
 }
 
 // Calculate who needs to give money to who
-export function calcOwe(participants: Person[]): owe[] {
-    if (!participants[0].Debt) {
-        throw new Error("Calculate debt first");
-    }
-    
-    const owe: owe[] = [];
+function calcOwe(participants: Person[]) {
+    // Reset owe since we will recalculate all
+    participants.forEach(participant => delete participant.Owe);
+
+    // Save debt in an another place since we cannot duplicate object in array
+    if(!participants[0].Debt) throw(Error("Calculate debt first"));
+    const debts = participants.map(participant => participant.Debt as number);
+
 
     // Participants should already be sorted by debt
     // We want the ones with biggest debts to refund the one with the smallest one
-    participants.forEach(participantPosDebt => {
-        if (participantPosDebt.Debt as number > 0) {
-            let debtToBalance = participantPosDebt.Debt as number;
+    debts.forEach((debtPositive, index) => {
+        if (debtPositive > 0) {
+            let debtToBalance = debtPositive;
             
             // Give the money to a person who has a negative debt, starting from the end
-            participants.slice().reverse().forEach(participantNegDebt => {
+            debts.slice().reverse().forEach((debtNegative, reversedIndex) => {
                 if (debtToBalance === 0) return
 
-                if (participantNegDebt.Debt as number < 0){
+                if (debtNegative < 0){
                 
-                    if (participantNegDebt.Debt as number + debtToBalance > 0) {
+                    if (debtNegative + debtToBalance > 0) {
                         // Cannot give all the money at once
                         // Give the maximum amount and save the rest
                         // for another person
-                        owe.push({
-                            who: participantPosDebt.Name,
-                            amount: Math.abs(participantNegDebt.Debt as number),
-                            toWho: participantNegDebt.Name
+                        if (!participants[index].Owe) participants[index].Owe = [];
+                        (participants[index].Owe as Owe[]).push({
+                            amount: Math.abs(debtNegative),
+                            toWho: participants.slice().reverse()[reversedIndex].Name
                         })
 
-                        debtToBalance = (debtToBalance + (participantNegDebt.Debt as number));
-                        participantPosDebt.Debt = debtToBalance;
-                        participantNegDebt.Debt = 0;
+                        debtToBalance = debtToBalance + debtNegative;
+                        debts[index] = debtToBalance;
+                        debts[debts.length-1-reversedIndex] = 0;
                     }
                 
                     else {
                         // Give all the money at once
-                        owe.push({
-                            who: participantPosDebt.Name,
+                        if (!participants[index].Owe) participants[index].Owe = [];
+                        (participants[index].Owe as Owe[]).push({
                             amount: debtToBalance,
-                            toWho: participantNegDebt.Name
+                            toWho: participants.slice().reverse()[reversedIndex].Name
                         })
 
-                        participantPosDebt.Debt = 0;
-                        participantNegDebt.Debt = (participantNegDebt.Debt as number) + debtToBalance;
+                        debts[index] = 0;
+                        debts[debts.length-1-reversedIndex] = debtNegative + debtToBalance;
                         debtToBalance = 0;
                     }
                 
@@ -121,5 +126,5 @@ export function calcOwe(participants: Person[]): owe[] {
         }
     })
 
-    return owe;
+    // return owe;
 }
