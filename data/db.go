@@ -1,8 +1,6 @@
 package data
 
 import (
-	"errors"
-
 	"github.com/go-xorm/xorm"
 )
 
@@ -106,14 +104,12 @@ func WritePognon(engine *xorm.Engine, pognon *PognonJSON) error {
 
 // WriteTransaction write a transaction to database
 func WriteTransaction(engine *xorm.Engine, transaction *Transaction) error {
-	p := Pognon{PognonHash: transaction.PognonHash}
-	has, err := engine.Get(&p)
-	if err != nil {
-		return err
-	}
-	if !has {
-		return errors.New("no pognon for this hash")
-	}
-	_, err = engine.Insert(transaction)
+	_, err := engine.Insert(transaction)
+	return err
+}
+
+// DeleteTransaction delete a transaction from database
+func DeleteTransaction(engine *xorm.Engine, transaction *Transaction) error {
+	_, err := engine.Delete(transaction)
 	return err
 }

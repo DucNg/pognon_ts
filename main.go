@@ -85,12 +85,31 @@ func postTransaction(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+	t.PognonHash = c.Param("hash")
 	if err := verifyInputTransaction(engine, t); err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	t.PognonHash = c.Param("hash")
 	err := data.WriteTransaction(engine, t)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, t)
+}
+
+func deleteTransaction(c echo.Context) error {
+	t := new(data.Transaction)
+	if err := c.Bind(t); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	t.PognonHash = c.Param("hash")
+	if err := verifyInputDeleteTransaction(engine, t); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	err := data.DeleteTransaction(engine, t)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, err.Error())

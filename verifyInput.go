@@ -34,6 +34,15 @@ func verifyInputPognon(db *xorm.Engine, pognon *data.PognonJSON) error {
 
 // verifyInputTransaction check that user input is valid
 func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) error {
+	// Pognon must exist
+	p, err := data.GetPognon(db, transaction.PognonHash)
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return errors.New("No pognon for this hash")
+	}
+
 	// At least one buyer
 	if len(transaction.Buyers) <= 0 {
 		return errors.New("You need at least one buyer")
@@ -85,6 +94,25 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 				strconv.FormatUint(uint64(purchase.IDPerson), 10) +
 				" doesn't exist in database")
 		}
+	}
+
+	return nil
+}
+
+// VerifyInputDeleteTransaction check if pognon exist before deleting transaction
+func verifyInputDeleteTransaction(db *xorm.Engine, transaction *data.Transaction) error {
+	// Pognon must exist
+	p, err := data.GetPognon(db, transaction.PognonHash)
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return errors.New("No pognon for this hash")
+	}
+
+	// Transaction ID musn't be empty
+	if transaction.IDTransaction == 0 {
+		return errors.New("No transaction ID")
 	}
 
 	return nil
