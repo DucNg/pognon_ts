@@ -100,9 +100,9 @@ func verifyInputTransaction(db *xorm.Engine, transaction *data.Transaction) erro
 }
 
 // VerifyInputDeleteTransaction check if pognon exist before deleting transaction
-func verifyInputDeleteTransaction(db *xorm.Engine, transaction *data.Transaction) error {
+func verifyInputDeleteTransaction(db *xorm.Engine, hash string, IDTransaction uint16) error {
 	// Pognon must exist
-	p, err := data.GetPognon(db, transaction.PognonHash)
+	p, err := data.GetPognon(db, hash)
 	if err != nil {
 		return err
 	}
@@ -111,8 +111,17 @@ func verifyInputDeleteTransaction(db *xorm.Engine, transaction *data.Transaction
 	}
 
 	// Transaction ID musn't be empty
-	if transaction.IDTransaction == 0 {
+	if IDTransaction == 0 {
 		return errors.New("No transaction ID")
+	}
+
+	// Transaction must exist
+	has, err := db.Get(&data.Transaction{IDTransaction: IDTransaction})
+	if err != nil {
+		return err
+	}
+	if !has {
+		return errors.New("This transaction doesn't exist")
 	}
 
 	return nil

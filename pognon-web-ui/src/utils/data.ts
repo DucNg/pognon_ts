@@ -65,6 +65,10 @@ export const columns: column[] = [
     {
         id: "date",
         label: "Date"
+    },
+    {
+        id: "action",
+        label: "Action"
     }
 ];
 

@@ -79,7 +79,7 @@ function App() {
       </AppBar>
       <Container className="container">
           <ParticipantsCards participants={participants}/>
-          <TableTransaction transactions={transactions} participants={participants}/>
+          <TableTransaction transactions={transactions} setTransactions={setTransactions} participants={participants} hash={pognonHash}/>
           {loadingStatus === "loading" &&
             <CircularProgress/>
           }

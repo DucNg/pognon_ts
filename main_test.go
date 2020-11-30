@@ -39,10 +39,6 @@ const (
 		"Buyers": [{"IDPerson":30, "Amount":1234}],
 		"For":    [{"IDPerson":82, "Amount":1234}]
 }`
-
-	transactionDelete1 = `{
-		"IDTransaction": 1		
-}`
 )
 
 func init() {
@@ -170,7 +166,9 @@ func TestPostPognon(t *testing.T) {
 	testStatus400(t, rec)
 
 	t.Log("Test delete transaction")
-	c, rec = createEchoContext(t, http.MethodDelete, "/api/pognon/abcdefgh/transaction", transactionDelete1, "abcdefgh")
+	c, rec = createEchoContext(t, http.MethodDelete, "/api/pognon/abcdefgh/transaction/1", "", "abcdefgh")
+	c.SetParamNames("IDTransaction")
+	c.SetParamValues("1")
 	err = deleteTransaction(c)
 	if err != nil {
 		t.Fatal(err)

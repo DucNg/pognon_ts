@@ -109,7 +109,7 @@ func WriteTransaction(engine *xorm.Engine, transaction *Transaction) error {
 }
 
 // DeleteTransaction delete a transaction from database
-func DeleteTransaction(engine *xorm.Engine, transaction *Transaction) error {
-	_, err := engine.Delete(transaction)
+func DeleteTransaction(engine *xorm.Engine, IDTransaction uint16) error {
+	_, err := engine.Delete(&Transaction{IDTransaction: IDTransaction})
 	return err
 }
