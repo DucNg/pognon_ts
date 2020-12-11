@@ -1,4 +1,5 @@
-import { Avatar, Box, Card, CardContent, CardHeader, Grid, Typography } from "@material-ui/core";
+import { Avatar, Box, Card, CardContent, CardHeader, Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
+import { MoreVert } from "@material-ui/icons"
 import React from "react";
 import { Person } from "../utils/data";
 
@@ -7,6 +8,16 @@ interface Props {
 }
 
 function ParticipantsCards({participants}: Props) {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+      };
+    
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     return(
         <Box mb={2}>
         <Grid container spacing={3}>
@@ -16,6 +27,28 @@ function ParticipantsCards({participants}: Props) {
                 <CardHeader key={person.Name}
                 avatar={<Avatar aria-label="person">{person.Name[0]}</Avatar>}
                 title={<Typography variant="h5">{person.Name}</Typography>}
+                action={
+                    <React.Fragment>
+                    <IconButton
+                        aria-label="settings"
+                        aria-controls="settings-menu"
+                        aria-haspopup="true"
+                        onClick={handleClick}
+                        >
+                        <MoreVert/>
+                    </IconButton>
+                    <Menu
+                        id="settings-menu"
+                        keepMounted
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                    >
+                        <MenuItem onClick={handleClose}>Edit</MenuItem>
+                        <MenuItem onClick={handleClose}>Delete</MenuItem>
+                    </Menu>
+                    </React.Fragment>
+                }
                 >
                 </CardHeader>
                 <CardContent>
