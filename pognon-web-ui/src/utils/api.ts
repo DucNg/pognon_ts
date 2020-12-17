@@ -43,7 +43,7 @@ export async function postTransaction(hash: string, transaction: Transaction): P
 export async function deleteTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<Transaction>> {
     const instance = createAxiosInstance();
     try {
-        const result = await instance.delete(`api/pognon/${hash}/${transaction.IDTransaction}`);
+        const result = await instance.delete(`api/pognon/${hash}/transaction/${transaction.IDTransaction}`);
         return result;
     } catch (err) {
         throw err;

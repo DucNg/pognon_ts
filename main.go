@@ -156,7 +156,7 @@ func main() {
 	e.GET("/api/pognon/:hash", getPognonJSON)
 	e.POST("/api/pognon", postPognon)
 	e.POST("/api/pognon/:hash/transaction", postTransaction)
-	e.DELETE("/api/pognon/:hash/:IDTransaction", deleteTransaction)
+	e.DELETE("/api/pognon/:hash/transaction/:IDTransaction", deleteTransaction)
 
 	e.Logger.Fatal(e.Start(*port))
 }
