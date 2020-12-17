@@ -1,27 +1,72 @@
-import { Avatar, Box, Card, CardContent, CardHeader, Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
-import { MoreVert } from "@material-ui/icons"
+import { Avatar, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@material-ui/core";
+import { Delete } from "@material-ui/icons"
 import React from "react";
+import { deletePerson } from "../utils/api";
 import { Person } from "../utils/data";
 
 interface Props {
     participants: Person[];
+    setParticipants: React.Dispatch<React.SetStateAction<Person[]>>;
+    hash: string;
 }
 
-function ParticipantsCards({participants}: Props) {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+interface PersonToDelete {
+    person?: Person,
+    index: number
+}
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-      };
-    
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+function ParticipantsCards({participants, setParticipants, hash}: Props) {
+    const [openSure, setOpenSure] = React.useState<boolean>(false);
+    const [personToDelete, setPersonToDelete] = React.useState<PersonToDelete>({
+        person: undefined,
+        index: 0
+    });
+
+    const handleOpenSure = (person: Person, index: number) => {
+        setPersonToDelete({person,index});
+        setOpenSure(true);
+    }
+
+    const handleCloseSure = () => {
+        setOpenSure(false);
+    }
+
+    const handleDelete = async () => {
+        if (!personToDelete.person) { return }
+        try {
+            await deletePerson(hash, personToDelete.person);
+            participants.splice(personToDelete.index, 1);
+            setParticipants([...participants]);
+        } catch(err) {
+            console.log(err);
+        }
+    }
 
     return(
         <Box mb={2}>
+        <Dialog 
+            open={openSure}
+            onClose={handleCloseSure}
+        >
+            <DialogTitle>{"Are you sure?"}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    Are you sure you want to delete this person?
+                    Make sure he is not involved in any transaction
+                    before deleting.
+                </DialogContentText>
+                <DialogActions>
+                    <Button onClick={handleCloseSure} color="primary">
+                        No
+                    </Button>
+                    <Button onClick={handleDelete} color="secondary">
+                        Yes
+                    </Button>
+                </DialogActions>
+            </DialogContent>
+        </Dialog>
         <Grid container spacing={3}>
-        {participants[0] && participants.map((person: Person) => (
+        {participants[0] && participants.map((person: Person, index) => (
             <Grid key={person.IDPerson} item xs={3}>
                 <Card key={person.Name}>
                 <CardHeader key={person.Name}
@@ -30,23 +75,11 @@ function ParticipantsCards({participants}: Props) {
                 action={
                     <React.Fragment>
                     <IconButton
-                        aria-label="settings"
-                        aria-controls="settings-menu"
-                        aria-haspopup="true"
-                        onClick={handleClick}
+                        aria-label="delete"
+                        onClick={_ => handleOpenSure(person, index)}
                         >
-                        <MoreVert/>
+                        <Delete/>
                     </IconButton>
-                    <Menu
-                        id="settings-menu"
-                        keepMounted
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                    >
-                        <MenuItem onClick={handleClose}>Edit</MenuItem>
-                        <MenuItem onClick={handleClose}>Delete</MenuItem>
-                    </Menu>
                     </React.Fragment>
                 }
                 >
