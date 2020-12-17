@@ -1,8 +1,6 @@
 package data
 
 import (
-	"errors"
-
 	"github.com/go-xorm/xorm"
 )
 
@@ -119,28 +117,8 @@ func DeleteTransaction(engine *xorm.Engine, IDTransaction uint16) error {
 // DeletePerson delete a person from database
 // Before deleting we need to check if the person is involved in any
 // transaction. Otherwise all debt will be wrong.
-func DeletePerson(engine *xorm.Engine, Hash string, IDPerson uint16) error {
-	has, err := engine.QueryString(
-		`SELECT i_d_transaction
-			FROM 'transaction'
-			WHERE buyers LIKE '%' || '"IDPerson":' || ? || '%'
-			OR for LIKE '%' || '"IDPerson":' || ? || '%'`,
-		IDPerson, IDPerson)
-
-	if err != nil {
-		return err
-	}
-	// If the person is involved in a transaction, we need
-	// to ask the user to manually delete the person from transactions.
-	if has != nil {
-		return errors.New("Cannot delete. This person is involved in transactions")
-	}
-
+func DeletePerson(engine *xorm.Engine, IDPerson uint16) error {
 	// If everyhing is fine we delete the person
-	_, err = engine.Delete(&Person{IDPerson: IDPerson})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	_, err := engine.Delete(&Person{IDPerson: IDPerson})
+	return err
 }

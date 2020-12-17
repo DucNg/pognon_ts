@@ -48,22 +48,7 @@ func TestDeletePerson(t *testing.T) {
 	t.Log("Sucessfully added a transaction")
 
 	t.Log("Trying to delete IDPerson 1")
-
-	err = DeletePerson(engine, "abcdefgh", 1)
-	if err == nil || err.Error() != "Cannot delete. This person is involved in transactions" {
-		t.Fatal("Wrong error", err)
-	}
-
-	t.Log("Returned the correct error")
-
-	t.Log("Delete the transaction")
-	err = DeleteTransaction(engine, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log("Delete the person")
-	err = DeletePerson(engine, "abcdefgh", 1)
+	err = DeletePerson(engine, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
