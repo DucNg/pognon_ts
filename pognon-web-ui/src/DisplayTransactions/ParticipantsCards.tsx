@@ -1,9 +1,10 @@
-import { Avatar, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@material-ui/core";
+import { Avatar, Box, Card, CardContent, CardHeader, Grid, IconButton, Typography } from "@material-ui/core";
 import { Delete } from "@material-ui/icons"
 import React from "react";
 import ErrorMessage from "../ErrorMessage";
 import { deletePerson } from "../utils/api";
 import { ErrorMsg, Person } from "../utils/data";
+import SureDialog from "./SureDialog";
 
 interface Props {
     participants: Person[];
@@ -27,13 +28,9 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
         msg: "",
     })
 
-    const handleOpenSure = (person: Person, index: number) => {
-        setPersonToDelete({person,index});
+    const handleOpenSure = (personToDelete: PersonToDelete) => {
+        setPersonToDelete(personToDelete);
         setOpenSure(true);
-    }
-
-    const handleCloseSure = () => {
-        setOpenSure(false);
     }
 
     const handleDelete = async () => {
@@ -50,27 +47,16 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
 
     return(
         <Box mb={2}>
-        <Dialog 
-            open={openSure}
-            onClose={handleCloseSure}
-        >
-            <DialogTitle>{"Are you sure?"}</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    Are you sure you want to delete this person?
-                    Make sure he is not involved in any transaction
-                    before deleting.
-                </DialogContentText>
-                <DialogActions>
-                    <Button onClick={handleCloseSure} color="primary">
-                        No
-                    </Button>
-                    <Button onClick={handleDelete} color="secondary">
-                        Yes
-                    </Button>
-                </DialogActions>
-            </DialogContent>
-        </Dialog>
+        <SureDialog 
+            openSure={openSure}  
+            setOpenSure={setOpenSure}    
+            handleDelete={handleDelete}
+            message={
+                `Are you sure you want to delete this person?
+                Make sure he is not involved in any transaction
+                before deleting.`
+            }
+        />
         <Grid container spacing={3}>
         {participants[0] && participants.map((person: Person, index) => (
             <Grid key={person.IDPerson} item xs={3}>
@@ -82,7 +68,7 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
                     <React.Fragment>
                     <IconButton
                         aria-label="delete"
-                        onClick={_ => handleOpenSure(person, index)}
+                        onClick={_ => handleOpenSure({person, index})}
                         >
                         <Delete/>
                     </IconButton>
