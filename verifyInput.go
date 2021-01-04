@@ -168,7 +168,7 @@ func verifyInputDeletePerson(db *xorm.Engine, hash string, IDPerson uint16) erro
 	// If the person is involved in a transaction, we need
 	// to ask the user to manually delete the person from transactions.
 	if IDTransaction != nil {
-		return errors.New("Cannot delete. This person is involved in transactions")
+		return errors.New("Cannot delete, this person is involved in transactions")
 	}
 
 	return nil
