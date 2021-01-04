@@ -1,8 +1,9 @@
 import { Avatar, Box, Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Typography } from "@material-ui/core";
 import { Delete } from "@material-ui/icons"
 import React from "react";
+import ErrorMessage from "../ErrorMessage";
 import { deletePerson } from "../utils/api";
-import { Person } from "../utils/data";
+import { ErrorMsg, Person } from "../utils/data";
 
 interface Props {
     participants: Person[];
@@ -21,6 +22,10 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
         person: undefined,
         index: 0
     });
+    const [errorMsg, setErrorMsg] = React.useState<ErrorMsg>({
+        status: false,
+        msg: "",
+    })
 
     const handleOpenSure = (person: Person, index: number) => {
         setPersonToDelete({person,index});
@@ -39,6 +44,7 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
             setParticipants([...participants]);
         } catch(err) {
             console.log(err);
+            setErrorMsg({status: true, msg: `${err.response.data}`})
         }
     }
 
@@ -95,6 +101,7 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
                 </Card>
             </Grid>))}
         </Grid>
+        <ErrorMessage errorMsg={errorMsg} />
         </Box>
     )
 }

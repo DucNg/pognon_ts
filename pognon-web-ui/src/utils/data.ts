@@ -72,7 +72,7 @@ export const columns: column[] = [
     }
 ];
 
-export interface errorTransaction {
+export interface ErrorMsg {
     status: boolean;
     type?: string;
     index?: number;

@@ -1,15 +1,16 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, TextField, Fab, 
-    DialogActions, DialogContentText, Box, FormControlLabel, Switch, Snackbar } 
+    DialogActions, DialogContentText, Box, FormControlLabel, Switch } 
     from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 
 import './AddTransaction.css';
 
-import { errorTransaction, Person, Transaction } from '../utils/data';
+import { ErrorMsg, Person, Transaction } from '../utils/data';
 import SelectPersons from './SelectPersons';
 import { postTransaction } from '../utils/api';
 import { calcDebt } from '../utils/calculation';
+import ErrorMessage from '../ErrorMessage';
 
 interface Props {
     pognonHash: string,
@@ -34,7 +35,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
     const [open, setOpen] = useState(false);
     const [isEveryone, setIsEveryone] = useState(true)
     const [transaction, setTransaction] = useState<Transaction>(resetTransaction())
-    const [error, setError] = useState<errorTransaction>({
+    const [error, setError] = useState<ErrorMsg>({
         status: false,
         type: "",
         msg: "",
@@ -182,7 +183,7 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
                 </Button>
             </DialogActions>
         </Dialog>
-        <Snackbar open={error.status} message={`Error: ${error.msg}`} color="secondary"/>
+        <ErrorMessage errorMsg={error} />
         </div>
     )
 }

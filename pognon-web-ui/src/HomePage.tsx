@@ -1,10 +1,11 @@
-import { Box, Button, Chip, Container, Grid, Paper, Snackbar, TextField, Typography } from "@material-ui/core";
+import { Box, Button, Chip, Container, Grid, Paper, TextField, Typography } from "@material-ui/core";
 import React, { ChangeEvent, useState, KeyboardEvent } from "react";
-import { errorTransaction, PognonJSON } from "./utils/data";
+import { ErrorMsg, PognonJSON } from "./utils/data";
 import "./HomePage.css";
 import { postPognon } from "./utils/api";
 import { encode } from "./utils/base64-url";
 import { Redirect } from "react-router-dom";
+import ErrorMessage from "./ErrorMessage";
 
 function HomePage() {
     const [pognonJSON, setPognonJSON] = useState<PognonJSON>({
@@ -12,7 +13,7 @@ function HomePage() {
         Participants: [],
     });
     const [participantName, setParticipantName] = useState("");
-    const [error, setError] = useState<errorTransaction>({
+    const [error, setError] = useState<ErrorMsg>({
         status: false,
         type: "",
         msg: ""
@@ -136,7 +137,7 @@ function HomePage() {
             {!error.status && error.type === "done" &&
                 <Redirect to={{pathname: `/${pognonJSON.Pognon.PognonHash}`}}/>
             }
-            <Snackbar open={error.status} message={`Error: ${error.msg}`} color="secondary"/>
+            <ErrorMessage errorMsg={error} />
         </Container>
     )
 }
