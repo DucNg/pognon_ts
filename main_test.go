@@ -147,7 +147,7 @@ func TestPostPognon(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testStatus500(t, rec)
+	testStatus400(t, rec)
 
 	t.Log("Test inequal sums")
 	c, rec = createEchoContext(t, http.MethodPost, "/api/pognon/abcdefgh/transaction", transaction2, "abcdefgh")
@@ -164,5 +164,57 @@ func TestPostPognon(t *testing.T) {
 		t.Fatal(err)
 	}
 	testStatus400(t, rec)
+
+	t.Log("Test delete person involved in transactions")
+	c, rec = createEchoContext(t, http.MethodDelete, "/api/pognon/abcdefgh/person/1", "", "abcdefgh")
+	c.SetParamNames("IDPerson")
+	c.SetParamValues("1")
+	err = deletePerson(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatus400(t, rec)
+
+	t.Log("Test delete transaction")
+	c, rec = createEchoContext(t, http.MethodDelete, "/api/pognon/abcdefgh/transaction/1", "", "abcdefgh")
+	c.SetParamNames("IDTransaction")
+	c.SetParamValues("1")
+	err = deleteTransaction(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatusOK(t, rec)
+
+	t.Log("Get deleted item")
+	c, rec = createEchoContext(t, http.MethodGet, "/api/pognon/abcdefgh", "", "abcdefgh")
+	err = getPognonJSON(c)
+	dec = json.NewDecoder(rec.Body)
+	if err := dec.Decode(&p); err != nil {
+		t.Fatal(err)
+	}
+	if p.Transactions != nil {
+		t.Fatal("Transaction wasn't deleted")
+	}
+
+	t.Log("Test delete person")
+	c, rec = createEchoContext(t, http.MethodDelete, "/api/pognon/abcdefgh/person/1", "", "abcdefgh")
+	c.SetParamNames("IDPerson")
+	c.SetParamValues("1")
+	err = deletePerson(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatusOK(t, rec)
+
+	t.Log("Get deleted item")
+	c, rec = createEchoContext(t, http.MethodGet, "/api/pognon/abcdefgh", "", "abcdefgh")
+	err = getPognonJSON(c)
+	dec = json.NewDecoder(rec.Body)
+	if err := dec.Decode(&p); err != nil {
+		t.Fatal(err)
+	}
+	if len(*p.Participants) > 2 {
+		t.Fatal("Person wasn't deleted", *p.Participants)
+	}
 
 }

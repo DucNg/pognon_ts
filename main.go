@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/DucNg/pognon_ts/data"
 	"github.com/go-xorm/xorm"
@@ -85,17 +86,57 @@ func postTransaction(c echo.Context) error {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+	t.PognonHash = c.Param("hash")
 	if err := verifyInputTransaction(engine, t); err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	t.PognonHash = c.Param("hash")
 	err := data.WriteTransaction(engine, t)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, t)
+}
+
+func deleteTransaction(c echo.Context) error {
+	PognonHash := c.Param("hash")
+	IDTransaction64, err := strconv.ParseUint(c.Param("IDTransaction"), 10, 16)
+	IDTransaction := uint16(IDTransaction64)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := verifyInputDeleteTransaction(engine, PognonHash, IDTransaction); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	err = data.DeleteTransaction(engine, IDTransaction)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, IDTransaction)
+}
+
+func deletePerson(c echo.Context) error {
+	PognonHash := c.Param("hash")
+	IDPerson64, err := strconv.ParseUint(c.Param("IDPerson"), 10, 16)
+	IDPerson := uint16(IDPerson64)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := verifyInputDeletePerson(engine, PognonHash, IDPerson); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	err = data.DeletePerson(engine, IDPerson)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, IDPerson)
 }
 
 func main() {
@@ -135,6 +176,8 @@ func main() {
 	e.GET("/api/pognon/:hash", getPognonJSON)
 	e.POST("/api/pognon", postPognon)
 	e.POST("/api/pognon/:hash/transaction", postTransaction)
+	e.DELETE("/api/pognon/:hash/transaction/:IDTransaction", deleteTransaction)
+	e.DELETE("/api/pognon/:hash/person/:IDPerson", deletePerson)
 
 	e.Logger.Fatal(e.Start(*port))
 }

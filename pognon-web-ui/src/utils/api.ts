@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { PognonJSON, Transaction } from './data';
+import { Person, PognonJSON, Transaction } from './data';
 
 function createAxiosInstance(): AxiosInstance {
     const instance = axios.create();
@@ -38,4 +38,24 @@ export async function postTransaction(hash: string, transaction: Transaction): P
         throw err;
     }
 
+}
+
+export async function deleteTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<Transaction>> {
+    const instance = createAxiosInstance();
+    try {
+        const result = await instance.delete(`api/pognon/${hash}/transaction/${transaction.IDTransaction}`);
+        return result;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export async function deletePerson(hash: string, person: Person): Promise<AxiosResponse<Person>> {
+    const instance = createAxiosInstance();
+    try {
+        const result = await instance.delete(`api/pognon/${hash}/person/${person.IDPerson}`);
+        return result
+    } catch (err) {
+        throw err;
+    }
 }

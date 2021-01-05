@@ -2,15 +2,15 @@ import React, { ChangeEvent, useState } from 'react';
 import { TextField, MenuItem, Grid, Select, IconButton, FormControlLabel, Switch } 
     from '@material-ui/core'
 import { Delete, ExpandMore } from '@material-ui/icons'
-import { Person, Purchase, Transaction, errorTransaction } from '../utils/data';
+import { Person, Purchase, Transaction, ErrorMsg } from '../utils/data';
 
 interface Props {
     type: keyof item,
     participants: Person[],
     transaction: Transaction,
     setTransaction: React.Dispatch<React.SetStateAction<Transaction>>,
-    error: errorTransaction,
-    setError: React.Dispatch<React.SetStateAction<errorTransaction>>
+    error: ErrorMsg,
+    setError: React.Dispatch<React.SetStateAction<ErrorMsg>>
 }
 
 interface item {
@@ -65,7 +65,7 @@ function SelectPersons({type, participants, transaction, setTransaction, error, 
         }
     }
 
-    const correspondingError = (error: errorTransaction, type: keyof item, index: number): boolean => {
+    const correspondingError = (error: ErrorMsg, type: keyof item, index: number): boolean => {
         return ((type === error.type && error.index === undefined) ||
         (type === error.type && index === error.index))
     } 

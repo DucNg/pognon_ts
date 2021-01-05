@@ -65,10 +65,14 @@ export const columns: column[] = [
     {
         id: "date",
         label: "Date"
+    },
+    {
+        id: "action",
+        label: "Action"
     }
 ];
 
-export interface errorTransaction {
+export interface ErrorMsg {
     status: boolean;
     type?: string;
     index?: number;
