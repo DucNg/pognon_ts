@@ -66,7 +66,7 @@ function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className="title">
-            Pognon_ts
+            <a href="/">Pognon_ts</a>
           </Typography>
           <AddTransaction 
             pognonHash={pognonHash} 
