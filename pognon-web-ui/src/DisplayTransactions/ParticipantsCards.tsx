@@ -19,7 +19,12 @@ function ParticipantsCards({participants}: Props) {
                 >
                 </CardHeader>
                 <CardContent>
-                <Typography variant="body1">Debt: {person && person.Debt && person.Debt.toFixed(2)}€</Typography>
+                <Typography variant="body1">
+                    {(person && person.Debt) && (person.Debt > 0 
+                    ? `Debt: ${person.Debt.toFixed(2)}`
+                    : `Credit: ${-person.Debt.toFixed(2)}`)}
+                    €
+                </Typography>
                 {person.Owe && person.Owe.map(owe => (
                 <Typography variant="body2">
                     Owe {owe.amount.toFixed(2)}€ to {owe.toWho}
