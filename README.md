@@ -8,16 +8,16 @@ Backend is in Go and uses Echo. Frontend is in React and uses Material-UI.
 
 * Multiple buyers
 * Multiple persons benefits from the payment
-* Calculate debts
+* Calculate debts and credits
 * Equal share for each participants
 
 # TODO
 
-* PUT, DELETE
-* "Owe" calculation, "balance"
+* PUT
 * Transaction details
 * Save URL for previously created pognon
 * Currencies
+* Reactive
 
 # Installation
 
