@@ -1,4 +1,4 @@
-import { Avatar, Box, Card, CardContent, CardHeader, Grid, Typography } from "@material-ui/core";
+import { Box, Card, CardContent, CardHeader, Grid, Typography } from "@material-ui/core";
 import React from "react";
 import { Person } from "../utils/data";
 
@@ -14,7 +14,6 @@ function ParticipantsCards({participants}: Props) {
             <Grid key={person.IDPerson} item xs={3}>
                 <Card key={person.Name}>
                 <CardHeader key={person.Name}
-                avatar={<Avatar aria-label="person">{person.Name[0]}</Avatar>}
                 title={<Typography variant="h5">{person.Name}</Typography>}
                 >
                 </CardHeader>
