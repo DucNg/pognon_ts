@@ -1,4 +1,4 @@
-import { Avatar, Box, Card, CardContent, CardHeader, Grid, IconButton, Typography } from "@material-ui/core";
+import { Box, Card, CardContent, CardHeader, Grid, Typography } from "@material-ui/core";
 import { Delete } from "@material-ui/icons"
 import React from "react";
 import ErrorMessage from "../ErrorMessage";
@@ -62,7 +62,6 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
             <Grid key={person.IDPerson} item xs={3}>
                 <Card key={person.Name}>
                 <CardHeader key={person.Name}
-                avatar={<Avatar aria-label="person">{person.Name[0]}</Avatar>}
                 title={<Typography variant="h5">{person.Name}</Typography>}
                 action={
                     <React.Fragment>
@@ -77,8 +76,13 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
                 >
                 </CardHeader>
                 <CardContent>
-                <Typography variant="body1">Debt: {person && person.Debt && person.Debt.toFixed(2)}€</Typography>
-                {person.Owe && person.Owe.map((owe, index) => (
+                <Typography variant="body1">
+                    {(person && person.Debt) && (person.Debt > 0 
+                    ? `Debt: ${person.Debt.toFixed(2)}`
+                    : `Credit: ${-person.Debt.toFixed(2)}`)}
+                    €
+                </Typography>
+                {person.Owe && person.Owe.map(owe => (
                 <Typography key={`${person.IDPerson}-owe-${index}`} variant="body2">
                     Owe {owe.amount.toFixed(2)}€ to {owe.toWho}
                 </Typography>

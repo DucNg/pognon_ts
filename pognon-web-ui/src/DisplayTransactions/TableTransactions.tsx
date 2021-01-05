@@ -79,7 +79,7 @@ function TableTransaction({transactions, setTransactions, participants, hash}: P
                             matchName(buyer.IDPerson)).join(", ")}</TableCell>
                         <TableCell key={transaction.IDTransaction + "amount"}>
                           {transaction.Buyers.reduce((prevValue, buyer) => 
-                              prevValue + buyer.Amount, 0)}</TableCell>
+                              prevValue + buyer.Amount, 0)}€</TableCell>
                         <TableCell key={transaction.IDTransaction + "for"}>
                           {transaction.For.map(forWho => 
                             matchName(forWho.IDPerson)).join(", ")}</TableCell>
