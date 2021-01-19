@@ -46,7 +46,7 @@ func GetTransactions(engine *xorm.Engine, hash string) (*[]Transaction, error) {
 	return &t, nil
 }
 
-// GetParticipants given a IDPognon get list of participants
+// GetParticipants given a pognon hash return list of participants
 func GetParticipants(engine *xorm.Engine, hash string) (*[]Person, error) {
 	par := []Person{}
 	err := engine.Where("pognon_hash = ?", hash).Find(&par)
