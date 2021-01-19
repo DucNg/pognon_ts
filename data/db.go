@@ -122,3 +122,10 @@ func DeletePerson(engine *xorm.Engine, IDPerson uint16) error {
 	_, err := engine.Delete(&Person{IDPerson: IDPerson})
 	return err
 }
+
+// PutPerson perform update for a person.
+// In practice it means changing it's name.
+func PutPerson(engine *xorm.Engine, person *Person) error {
+	_, err := engine.ID(person.IDPerson).Update(person)
+	return err
+}
