@@ -173,3 +173,27 @@ func verifyInputDeletePerson(db *xorm.Engine, hash string, IDPerson uint16) erro
 
 	return nil
 }
+
+// verifyInputPutPerson verify that sent person is valid
+func verifyInputPutPerson(db *xorm.Engine, hash string, person *data.Person) error {
+	// Pognon must exist
+	p, err := data.GetPognon(db, hash)
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return errors.New("No pognon for this hash")
+	}
+
+	// IDPerson must be present
+	if person.IDPerson == 0 {
+		return errors.New("IDPerson can't be empty")
+	}
+
+	// New name must be present
+	if person.Name == "" {
+		return errors.New("Name can't be empty")
+	}
+
+	return nil
+}

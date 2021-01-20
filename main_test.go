@@ -39,6 +39,11 @@ const (
 		"Buyers": [{"IDPerson":30, "Amount":1234}],
 		"For":    [{"IDPerson":82, "Amount":1234}]
 }`
+
+	personUpdate1 = `{
+		"IDPerson": 2,
+		"Name": "sava"
+}`
 )
 
 func init() {
@@ -215,6 +220,25 @@ func TestPostPognon(t *testing.T) {
 	}
 	if len(*p.Participants) > 2 {
 		t.Fatal("Person wasn't deleted", *p.Participants)
+	}
+
+	t.Log("Test update person")
+	c, rec = createEchoContext(t, http.MethodPut, "/api/pognon/abcdefgh/person", personUpdate1, "abcdefgh")
+	err = putPerson(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatusOK(t, rec)
+
+	t.Log("Get updated item")
+	c, rec = createEchoContext(t, http.MethodGet, "/api/pognon/abcdefgh", "", "abcdefgh")
+	err = getPognonJSON(c)
+	dec = json.NewDecoder(rec.Body)
+	if err := dec.Decode(&p); err != nil {
+		t.Fatal(err)
+	}
+	if (*p.Participants)[0].Name != "sava" {
+		t.Fatal("Person wasn't updated correctly", *p.Participants)
 	}
 
 }
