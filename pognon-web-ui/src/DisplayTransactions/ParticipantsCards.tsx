@@ -1,9 +1,10 @@
 import { Box, Card, CardContent, CardHeader, Grid, IconButton, Typography } from "@material-ui/core";
-import { Delete } from "@material-ui/icons"
+import { Delete, Edit } from "@material-ui/icons"
 import React from "react";
 import ErrorMessage from "../ErrorMessage";
-import { deletePerson } from "../utils/api";
+import { deletePerson, putPerson } from "../utils/api";
 import { ErrorMsg, Person } from "../utils/data";
+import EditDialog from "./EditDialog";
 import SureDialog from "./SureDialog";
 
 interface Props {
@@ -12,14 +13,14 @@ interface Props {
     hash: string;
 }
 
-interface PersonToDelete {
+interface PersonToEdit {
     person?: Person,
     index: number
 }
 
 function ParticipantsCards({participants, setParticipants, hash}: Props) {
     const [openSure, setOpenSure] = React.useState<boolean>(false);
-    const [personToDelete, setPersonToDelete] = React.useState<PersonToDelete>({
+    const [personToEdit, setPersonToEdit] = React.useState<PersonToEdit>({
         person: undefined,
         index: 0
     });
@@ -27,17 +28,36 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
         status: false,
         msg: "",
     })
+    const [openEdit, setOpenEdit] = React.useState<boolean>(false);
 
-    const handleOpenSure = (personToDelete: PersonToDelete) => {
-        setPersonToDelete(personToDelete);
+    const handleOpenSure = (personToDelete: PersonToEdit) => {
+        setPersonToEdit(personToDelete);
         setOpenSure(true);
     }
 
     const handleDelete = async () => {
-        if (!personToDelete.person) { return }
+        if (!personToEdit.person) { return }
         try {
-            await deletePerson(hash, personToDelete.person);
-            participants.splice(personToDelete.index, 1);
+            await deletePerson(hash, personToEdit.person);
+            participants.splice(personToEdit.index, 1);
+            setParticipants([...participants]);
+        } catch(err) {
+            console.log(err);
+            setErrorMsg({status: true, msg: `${err.response.data}`})
+        }
+    }
+
+    const handleOpenEdit = (personToEdit: PersonToEdit) => {
+        setPersonToEdit({...personToEdit});
+        console.log(personToEdit.person?.Name as string);
+        setOpenEdit(true);
+    }
+
+    const handleEdit = async () => {
+        if (!personToEdit.person) { return }
+        try {
+            const editedPerson = await putPerson(hash, personToEdit.person);
+            participants[personToEdit.index].Name = editedPerson.data.Name;
             setParticipants([...participants]);
         } catch(err) {
             console.log(err);
@@ -57,6 +77,13 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
                 before deleting.`
             }
         />
+        <EditDialog
+            openEdit={openEdit}
+            setOpenEdit={setOpenEdit}
+            handleEdit={handleEdit}
+            personToEdit={personToEdit}
+            setPersonToEdit={setPersonToEdit}
+        />
         <Grid container spacing={3}>
         {participants[0] && participants.map((person: Person, index) => (
             <Grid key={person.IDPerson} item xs={3}>
@@ -65,6 +92,12 @@ function ParticipantsCards({participants, setParticipants, hash}: Props) {
                 title={<Typography variant="h5">{person.Name}</Typography>}
                 action={
                     <React.Fragment>
+                    <IconButton
+                        aria-label="edit"
+                        onClick={_ => handleOpenEdit({person, index})}
+                        >
+                        <Edit/>
+                    </IconButton>
                     <IconButton
                         aria-label="delete"
                         onClick={_ => handleOpenSure({person, index})}
