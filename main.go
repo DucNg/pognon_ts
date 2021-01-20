@@ -139,6 +139,26 @@ func deletePerson(c echo.Context) error {
 	return c.JSON(http.StatusOK, IDPerson)
 }
 
+func putPerson(c echo.Context) error {
+	p := new(data.Person)
+	if err := c.Bind(p); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	PognonHash := c.Param("hash")
+	if err := verifyInputPutPerson(engine, PognonHash, p); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	err := data.PutPerson(engine, p)
+	if err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, p)
+}
+
 func main() {
 	allowCORS := flag.Bool("allow-cors", false,
 		"Allow CORS for test purposes. Allow the usage of the build in node "+
@@ -178,6 +198,7 @@ func main() {
 	e.POST("/api/pognon/:hash/transaction", postTransaction)
 	e.DELETE("/api/pognon/:hash/transaction/:IDTransaction", deleteTransaction)
 	e.DELETE("/api/pognon/:hash/person/:IDPerson", deletePerson)
+	e.PUT("/api/pognon/:hash/person", putPerson)
 
 	e.Logger.Fatal(e.Start(*port))
 }
