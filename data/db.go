@@ -129,3 +129,9 @@ func PutPerson(engine *xorm.Engine, person *Person) error {
 	_, err := engine.ID(person.IDPerson).Update(person)
 	return err
 }
+
+// PutTransaction perform update on a transaction
+func PutTransaction(engine *xorm.Engine, transaction *Transaction) error {
+	_, err := engine.ID(transaction.IDTransaction).Update(transaction)
+	return err
+}

@@ -197,3 +197,27 @@ func verifyInputPutPerson(db *xorm.Engine, hash string, person *data.Person) err
 
 	return nil
 }
+
+// verifyPutTransaction verify that sent transaction is valid for update
+func verifyInputPutTransaction(db *xorm.Engine, hash string, transaction *data.Transaction) error {
+	// Pognon must exist
+	p, err := data.GetPognon(db, hash)
+	if err != nil {
+		return err
+	}
+	if p == nil {
+		return errors.New("No pognon for this hash")
+	}
+
+	// IDPognon must be present
+	if transaction.IDTransaction == 0 {
+		return errors.New("IDTransaction can't be empty")
+	}
+
+	// PognonHash can't be changed
+	if transaction.PognonHash != hash {
+		return errors.New("Transaction hash can't be changed")
+	}
+
+	return nil
+}
