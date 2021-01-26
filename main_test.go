@@ -24,6 +24,7 @@ const (
 }
 `
 	transaction1 = `{
+		"PognonHash": "abcdefgh",
 		"Buyers": [{"IDPerson":1, "Amount":10.25}],
 		"For":    [{"IDPerson":1, "Amount":5}, {"IDPerson":2, "Amount":3}, {"IDPerson":3, "Amount":2.25}],
 		"Reason": "love"
@@ -31,11 +32,13 @@ const (
 `
 
 	transaction2 = `{
+		"PognonHash": "abcdefgh",
 		"Buyers": [{"IDPerson":1, "Amount":1234}],
 		"For":	  [{"IDPerson":2, "Amount":300}]
 }`
 
 	transaction3 = `{
+		"PognonHash": "abcdefgh",
 		"Buyers": [{"IDPerson":30, "Amount":1234}],
 		"For":    [{"IDPerson":82, "Amount":1234}]
 }`
@@ -44,6 +47,15 @@ const (
 		"IDPerson": 2,
 		"Name": "sava"
 }`
+
+	transactionUpdate1 = `{
+		"IDTransaction": 1,
+		"PognonHash": "abcdefgh",
+		"Buyers": [{"IDPerson":1, "Amount":10.25}],
+		"For":    [{"IDPerson":1, "Amount":5}, {"IDPerson":2, "Amount":3}],
+		"Reason": "hate"
+}
+`
 )
 
 func init() {
@@ -180,6 +192,27 @@ func TestPostPognon(t *testing.T) {
 	}
 	testStatus400(t, rec)
 
+	t.Log("Test update transaction")
+	c, rec = createEchoContext(t, http.MethodPut, "/api/pognon/abdefgh/transaction/1", transactionUpdate1, "abcdefgh")
+	c.SetParamNames("IDTransaction")
+	c.SetParamValues("1")
+	err = putTransaction(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStatusOK(t, rec)
+	t.Log("Get updated item")
+	c, rec = createEchoContext(t, http.MethodGet, "/api/pognon/abcdefgh/transaction", "", "abcdefgh")
+	err = getTransactions(c)
+	t.Log(rec.Body)
+	dec = json.NewDecoder(rec.Body)
+	if err := dec.Decode(&t1); err != nil {
+		t.Fatal(err)
+	}
+	if len(t1[0].For) > 2 {
+		t.Fatal("Update failed")
+	}
+
 	t.Log("Test delete transaction")
 	c, rec = createEchoContext(t, http.MethodDelete, "/api/pognon/abcdefgh/transaction/1", "", "abcdefgh")
 	c.SetParamNames("IDTransaction")
@@ -223,7 +256,9 @@ func TestPostPognon(t *testing.T) {
 	}
 
 	t.Log("Test update person")
-	c, rec = createEchoContext(t, http.MethodPut, "/api/pognon/abcdefgh/person", personUpdate1, "abcdefgh")
+	c, rec = createEchoContext(t, http.MethodPut, "/api/pognon/abcdefgh/person/2", personUpdate1, "abcdefgh")
+	c.SetParamNames("IDPerson")
+	c.SetParamValues("2")
 	err = putPerson(c)
 	if err != nil {
 		t.Fatal(err)
