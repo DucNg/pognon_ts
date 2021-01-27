@@ -1,8 +1,6 @@
-import React, { ChangeEvent, useState } from 'react';
-import { Button, Dialog, DialogContent, DialogTitle, TextField, Fab, 
-    DialogActions, DialogContentText, Box, FormControlLabel, Switch } 
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { Button, Dialog, DialogContent, DialogTitle, TextField, DialogActions, DialogContentText, Box, FormControlLabel, Switch } 
     from '@material-ui/core';
-import { Add } from '@material-ui/icons';
 
 import './AddTransaction.css';
 
@@ -13,17 +11,16 @@ import { calcDebt } from '../utils/calculation';
 import ErrorMessage from '../ErrorMessage';
 
 interface Props {
+    open: boolean,
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
     pognonHash: string,
     participants: Person[],
     setParticipants: React.Dispatch<React.SetStateAction<Person[]>>
     transactions: Transaction[],
-    setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>
+    setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
+    index?: number
 }
 
-interface item {
-    buyer: string[],
-    for: string[],
-}
 
 const resetTransaction = () => ({
     Buyers: [{IDPerson: -1,Amount: 0, Rest: false}],
@@ -31,19 +28,23 @@ const resetTransaction = () => ({
     Reason: "",
 })
 
-function AddTransaction({pognonHash, participants, setParticipants, transactions, setTransactions}: Props) {
-    const [open, setOpen] = useState(false);
+function AddTransaction({open, setOpen, pognonHash, participants, setParticipants, transactions, setTransactions, index}: Props) {
     const [isEveryone, setIsEveryone] = useState(true)
     const [transaction, setTransaction] = useState<Transaction>(resetTransaction())
+
+    useEffect(() => {
+        if (index === undefined || index === -1) {
+            resetTransaction();
+        } else {
+            setTransaction(transactions[index]);
+        }
+    }, [open,index,transactions]);
+
     const [error, setError] = useState<ErrorMsg>({
         status: false,
         type: "",
         msg: "",
     })
-
-    const add = () => {
-        setOpen(true)
-    };
 
     const handleCloseDialog = () => {
         setOpen(false);
@@ -132,9 +133,6 @@ function AddTransaction({pognonHash, participants, setParticipants, transactions
 
     return(
         <div>
-        <Fab className="fab" color="secondary" aria-label="add" onClick={add}>
-            <Add />
-        </Fab>
         <Dialog open={open} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add a transaction</DialogTitle>
             <DialogContent>
