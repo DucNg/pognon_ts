@@ -146,11 +146,13 @@ func putPerson(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	PognonHash := c.Param("hash")
-	if err := verifyInputPutPerson(engine, PognonHash, p); err != nil {
+	IDPerson64, err := strconv.ParseUint(c.Param("IDPerson"), 10, 16)
+	IDPerson := uint16(IDPerson64)
+	if err := verifyInputPutPerson(engine, PognonHash, IDPerson, p); err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	err := data.PutPerson(engine, p)
+	err = data.PutPerson(engine, p)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -166,11 +168,13 @@ func putTransaction(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	PognonHash := c.Param("hash")
-	if err := verifyInputPutTransaction(engine, PognonHash, t); err != nil {
+	IDTransaction64, err := strconv.ParseUint(c.Param("IDTransaction"), 10, 16)
+	IDTransaction := uint16(IDTransaction64)
+	if err := verifyInputPutTransaction(engine, PognonHash, IDTransaction, t); err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	err := data.PutTransaction(engine, t)
+	err = data.PutTransaction(engine, t)
 	if err != nil {
 		log.Println(err)
 		return c.JSON(http.StatusInternalServerError, err.Error())

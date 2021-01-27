@@ -175,7 +175,7 @@ func verifyInputDeletePerson(db *xorm.Engine, hash string, IDPerson uint16) erro
 }
 
 // verifyInputPutPerson verify that sent person is valid
-func verifyInputPutPerson(db *xorm.Engine, hash string, person *data.Person) error {
+func verifyInputPutPerson(db *xorm.Engine, hash string, IDPerson uint16, person *data.Person) error {
 	// Pognon must exist
 	p, err := data.GetPognon(db, hash)
 	if err != nil {
@@ -195,11 +195,19 @@ func verifyInputPutPerson(db *xorm.Engine, hash string, person *data.Person) err
 		return errors.New("Name can't be empty")
 	}
 
+	// IDPerson must match
+	if person.IDPerson != IDPerson {
+		return errors.New("IDPerson don't match endpoint")
+	}
+
+	// Set pognonHash
+	person.PognonHash = hash
+
 	return nil
 }
 
 // verifyPutTransaction verify that sent transaction is valid for update
-func verifyInputPutTransaction(db *xorm.Engine, hash string, transaction *data.Transaction) error {
+func verifyInputPutTransaction(db *xorm.Engine, hash string, IDTransaction uint16, transaction *data.Transaction) error {
 	// Pognon must exist
 	p, err := data.GetPognon(db, hash)
 	if err != nil {
@@ -209,15 +217,18 @@ func verifyInputPutTransaction(db *xorm.Engine, hash string, transaction *data.T
 		return errors.New("No pognon for this hash")
 	}
 
-	// IDPognon must be present
+	// IDTransaction must be present
 	if transaction.IDTransaction == 0 {
 		return errors.New("IDTransaction can't be empty")
 	}
 
-	// PognonHash can't be changed
-	if transaction.PognonHash != hash {
-		return errors.New("Transaction hash can't be changed")
+	// IDTransaction must match
+	if IDTransaction != transaction.IDTransaction {
+		return errors.New("IDTransaction don't match endpoint")
 	}
+
+	// Set pognonHash
+	transaction.PognonHash = hash
 
 	return nil
 }
