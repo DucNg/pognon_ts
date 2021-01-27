@@ -1,15 +1,19 @@
 import { Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@material-ui/core";
-import { Delete } from "@material-ui/icons";
+import { Delete, Edit } from "@material-ui/icons";
 import moment from "moment";
 import React from "react";
+import AddTransaction from "../AddTransactionDialog/AddTransaction";
 import { deleteTransaction } from "../utils/api";
 import { columns, Person, Transaction } from "../utils/data";
 import SureDialog from "./SureDialog";
+
+import "./TableTransactions.css"
 
 interface Props {
     transactions: Transaction[],
     setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
     participants: Person[],
+    setParticipants: React.Dispatch<React.SetStateAction<Person[]>>,
     hash: string,
 }
 
@@ -19,13 +23,15 @@ interface TransactionToDelete {
   index: number
 }
 
-function TableTransaction({transactions, setTransactions, participants, hash}: Props) {
+function TableTransaction({transactions, setTransactions, participants, setParticipants, hash}: Props) {
   const [openSure, setOpenSure] = React.useState<boolean>(false);
   const [transactionToDelete, setTransactionToDelete] = React.useState<TransactionToDelete>({
     hash: "",
     transaction: undefined,
     index: 0
   })
+  const [openEdit, setOpenEdit] = React.useState<boolean>(false);
+  const [indexToEdit, setIndexToEdit] = React.useState<number>(-1);
 
     function matchName(IDPerson: Number): string | undefined  {
         if (participants[0]) {
@@ -51,6 +57,11 @@ function TableTransaction({transactions, setTransactions, participants, hash}: P
       }
     }
 
+    const handleOpenEdit = (index: number) => {
+      setOpenEdit(true);
+      setIndexToEdit(index)
+    }
+
     return(
         <Grid item xs={12}>
           <SureDialog 
@@ -60,6 +71,16 @@ function TableTransaction({transactions, setTransactions, participants, hash}: P
             message={
               `Are you sure you want to delete this transaction?`
             }
+          />
+          <AddTransaction
+            open={openEdit}
+            setOpen={setOpenEdit}
+            participants={participants}
+            setParticipants={setParticipants}
+            transactions={transactions}
+            setTransactions={setTransactions}
+            pognonHash={hash}
+            index={indexToEdit}
           />
                 <Paper><TableContainer><Table stickyHeader aria-label="sticky table">
                   <TableHead>
@@ -93,9 +114,14 @@ function TableTransaction({transactions, setTransactions, participants, hash}: P
                         </Tooltip>
                             
                         <TableCell key={`${transaction.IDTransaction}-deleteBtn`}>
+                          <span id="buttons">
+                          <IconButton aria-label="edit" onClick={_ => handleOpenEdit(index)}>
+                              <Edit/>
+                          </IconButton>
                           <IconButton aria-label="delete" onClick={_ => handleOpenSure({hash, transaction, index})}>
                               <Delete/>
                           </IconButton>
+                          </span>
                         </TableCell>
 
                       </TableRow>
