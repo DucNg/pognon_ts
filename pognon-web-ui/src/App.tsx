@@ -13,7 +13,7 @@ import {
   RouteComponentProps, Redirect
 } from 'react-router-dom';
 
-import { AppBar, Toolbar, Typography, Container, CircularProgress } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Container, CircularProgress, Fab } from '@material-ui/core';
 import { fetchData } from './utils/api';
 import { Transaction, Person } from './utils/data';
 import { calcDebt } from './utils/calculation';
@@ -21,12 +21,14 @@ import AddTransaction from './AddTransactionDialog/AddTransaction'
 import ParticipantsCards from './DisplayTransactions/ParticipantsCards';
 import TableTransaction from './DisplayTransactions/TableTransactions';
 import HomePage from './HomePage';
+import { Add } from '@material-ui/icons';
 
 function App() {
   const [pognonHash, setPognonHash] = useState("");
   const [participants, setParticipants] = useState<Person[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingStatus, setLoadingStatus] = useState("loading");
+  const [open, setOpen] = useState<boolean>(false);
   
 
   async function fetch(hash: string) { 
@@ -46,6 +48,10 @@ function App() {
   };
 
   type TParams = { hash: string };
+
+  const add = () => {
+    setOpen(true)
+  };
 
   function GetCreatePognon() {
     return(
@@ -68,18 +74,29 @@ function App() {
           <Typography variant="h6" className="title">
             <a href="/">Pognon_ts</a>
           </Typography>
-          <AddTransaction 
+          <AddTransaction
+            open={open}
+            setOpen={setOpen}
             pognonHash={pognonHash} 
             participants={participants}
             setParticipants={setParticipants}
             transactions={transactions}
             setTransactions={setTransactions}
           />
+          <Fab className="fab" color="secondary" aria-label="add" onClick={add}>
+            <Add />
+          </Fab>
         </Toolbar>
       </AppBar>
+      
       <Container className="container">
           <ParticipantsCards participants={participants} setParticipants={setParticipants} hash={pognonHash} />
-          <TableTransaction transactions={transactions} setTransactions={setTransactions} participants={participants} hash={pognonHash}/>
+          <TableTransaction
+            transactions={transactions} 
+            setTransactions={setTransactions} 
+            participants={participants} 
+            setParticipants={setParticipants}
+            hash={pognonHash}/>
           {loadingStatus === "loading" &&
             <CircularProgress/>
           }
