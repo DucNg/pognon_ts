@@ -6,9 +6,10 @@ import './AddTransaction.css';
 
 import { ErrorMsg, Person, Transaction } from '../utils/data';
 import SelectPersons from './SelectPersons';
-import { postTransaction } from '../utils/api';
+import { postTransaction, putTransaction } from '../utils/api';
 import { calcDebt } from '../utils/calculation';
 import ErrorMessage from '../ErrorMessage';
+import { AxiosResponse } from 'axios';
 
 interface Props {
     open: boolean,
@@ -37,6 +38,7 @@ function AddTransaction({open, setOpen, pognonHash, participants, setParticipant
             resetTransaction();
         } else {
             setTransaction(transactions[index]);
+            setIsEveryone(false);
         }
     }, [open,index,transactions]);
 
@@ -61,20 +63,20 @@ function AddTransaction({open, setOpen, pognonHash, participants, setParticipant
         setTransaction({...transaction});
     }
 
-    const handleAdd = async () => {
+    function verifyInput(): (Transaction | undefined) {
         // Duplicate object
         const transactionVerify = {...transaction};
 
         // First line cannot be empty
         if(transactionVerify.Buyers[0].IDPerson === -1) {
             setError({status: true, type: "Buyers", msg: "You need at least one buyer"});
-            return
+            return;
         }
 
         // First for cannot be empty if everyone is unchecked
         if(!isEveryone && transactionVerify.For[0].IDPerson === -1) {
             setError({status: true, type: "For", msg: "You need at least one payee"});
-            return
+            return;
         }
 
         // Remove last entry if empty
@@ -103,25 +105,59 @@ function AddTransaction({open, setOpen, pognonHash, participants, setParticipant
             // If every amount for are specify, the total must equal the total amount brought
             if(totalAmountBuyers !== totalAmountFor) {
                 setError({status: true, type: "For", msg: "Sums aren't equals"});
-                return
+                return;
             }
         } else {
             // Make sure for amount doesn't exceed buyers amount           
             if(totalAmountFor > totalAmountBuyers) {
                 setError({status: true, type: "For", msg: "Received amount cannot exceed paid amount"});
-                return
+                return;
             }
+        }
+
+        return transactionVerify;
+    }
+
+    // finishTransaction close dialog, reset values to default and
+    // update state
+    function finishTransaction(res: AxiosResponse<Transaction>) {
+        setTransaction(resetTransaction());
+        handleCloseDialog();
+        setTransactions([res.data,...transactions]);
+        const newDebts = calcDebt(participants,[res.data,...transactions]);
+        setParticipants(newDebts);
+        setError({status: false, type: "", msg: ""});
+    }
+
+    const handleAdd = async () => {
+        const transactionVerify = verifyInput();
+        if (!transactionVerify) {
+            return;
         }
 
         // Send POST request to backend
         try {
             const res = await postTransaction(pognonHash, transactionVerify);
-            setTransaction(resetTransaction());
-            handleCloseDialog();
-            setTransactions([res.data,...transactions]);
-            const newDebts = calcDebt(participants,[res.data,...transactions]);
-            setParticipants(newDebts);
-            setError({status: false, type: "", msg: ""});
+            finishTransaction(res);
+        } catch (err) {
+            if (err.response) {
+                setError({status: true, type: "", msg: `${err.response.data}`});
+            } else {
+                setError({status: true, type: "", msg: `Backend error ${err}`});
+            }
+        }
+    };
+
+    const handleEdit = async () => {
+        const transactionVerify = verifyInput();
+        if (!transactionVerify) {
+            return;
+        }
+
+        // Send PUT request to backend
+        try {
+            const res = await putTransaction(pognonHash, transactionVerify);
+            finishTransaction(res);
         } catch (err) {
             if (err.response) {
                 setError({status: true, type: "", msg: `${err.response.data}`});
@@ -176,9 +212,15 @@ function AddTransaction({open, setOpen, pognonHash, participants, setParticipant
                 <Button onClick={handleCloseDialog} color="primary">
                     Cancel
                 </Button>
+                {(index === undefined || index === -1) ?
                 <Button onClick={handleAdd} color="primary">
                     Add
                 </Button>
+                :
+                <Button onClick={handleEdit} color="primary">
+                    Edit
+                </Button>
+                }
             </DialogActions>
         </Dialog>
         <ErrorMessage errorMsg={error} />
