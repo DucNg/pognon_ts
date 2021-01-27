@@ -63,7 +63,7 @@ export async function deletePerson(hash: string, person: Person): Promise<AxiosR
 export async function putPerson(hash: string, person: Person): Promise<AxiosResponse<Person>> {
     const instance = createAxiosInstance();
     try {
-        const result = await instance.put(`api/pognon/${hash}/person`, person);
+        const result = await instance.put(`api/pognon/${hash}/person/${person.IDPerson}`, person);
         return result;
     } catch (err) {
         throw err;
