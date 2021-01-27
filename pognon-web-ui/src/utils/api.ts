@@ -69,3 +69,13 @@ export async function putPerson(hash: string, person: Person): Promise<AxiosResp
         throw err;
     }
 }
+
+export async function putTransaction(hash: string, transaction: Transaction): Promise<AxiosResponse<Transaction>> {
+    const instance = createAxiosInstance();
+    try {
+        const result = await instance.put(`api/pognon/${hash}/transaction/${transaction.IDTransaction}`, transaction);
+        return result;
+    } catch (err) {
+        throw err;
+    }
+}
