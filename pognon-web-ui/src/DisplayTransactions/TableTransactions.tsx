@@ -3,8 +3,10 @@ import { Delete, Edit } from "@material-ui/icons";
 import moment from "moment";
 import React from "react";
 import AddTransaction from "../AddTransactionDialog/AddTransaction";
+import ErrorMessage from "../ErrorMessage";
 import { deleteTransaction } from "../utils/api";
-import { columns, Person, Transaction } from "../utils/data";
+import { calcDebt } from "../utils/calculation";
+import { columns, ErrorMsg, Person, Transaction } from "../utils/data";
 import SureDialog from "./SureDialog";
 
 import "./TableTransactions.css"
@@ -29,9 +31,14 @@ function TableTransaction({transactions, setTransactions, participants, setParti
     hash: "",
     transaction: undefined,
     index: 0
-  })
+  });
   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
   const [indexToEdit, setIndexToEdit] = React.useState<number>(-1);
+  const [error, setError] = React.useState<ErrorMsg>({
+    status: false,
+    type: "",
+    msg: "",
+  });
 
     function matchName(IDPerson: Number): string | undefined  {
         if (participants[0]) {
@@ -52,8 +59,15 @@ function TableTransaction({transactions, setTransactions, participants, setParti
         await deleteTransaction(transactionToDelete.hash, transactionToDelete.transaction);
         transactions.splice(transactionToDelete.index, 1);
         setTransactions([...transactions])
-      } catch(err) {
-        console.log(err);
+        const newDebts = calcDebt(participants,transactions);
+        setParticipants(newDebts);
+        setError({status: false, type: "", msg: ""});
+      } catch (err) {
+        if (err.response) {
+            setError({status: true, type: "", msg: `${err.response.data}`});
+        } else {
+            setError({status: true, type: "", msg: `Backend error ${err}`});
+        }
       }
     }
 
@@ -128,6 +142,7 @@ function TableTransaction({transactions, setTransactions, participants, setParti
                     ))}
                   </TableBody>
                 </Table></TableContainer></Paper>
+                <ErrorMessage errorMsg={error} />
         </Grid>
     )
 }
