@@ -1,17 +1,21 @@
+# Pognon_ts
+
 This application allow you to manage expenses with other persons.
 
 It's anonymous.
 
 Backend is in Go and uses Echo. Frontend is in React and uses Material-UI.
 
-# Features
+![logo](logo.svg)
+
+## Features
 
 * Multiple buyers
 * Multiple persons benefits from the payment
 * Calculate debts and credits
 * Equal share for each participants
 
-# TODO
+## TODO
 
 * Add members
 * Transaction details
@@ -19,16 +23,16 @@ Backend is in Go and uses Echo. Frontend is in React and uses Material-UI.
 * Currencies
 * Reactive
 
-# Installation
+## Installation
 
 ```shell
 git clone https://github.com/DucNg/pognon_ts.git
 cd pognon_ts
 ```
 
-## Dev environment
+### Dev environment
 
-### Backend
+#### Backend
 
 **Required: Go >= 1.15**
 
@@ -38,7 +42,7 @@ go run . -allow-cors
 
 Access backend on http://localhost:8080/
 
-### Frontend
+#### Frontend
 
 **Required: yarn or npm**
 
@@ -54,11 +58,11 @@ npm start
 
 Access frontend on http://localhost:3000/
 
-## Prod environment
+### Prod environment
 
 [See CI](https://github.com/DucNg/pognon_ts/blob/master/.github/workflows/main.yml) or manualy with the following:
 
-### Backend
+#### Backend
 
 **Required: Go >= 1.15**
 
@@ -66,7 +70,7 @@ Access frontend on http://localhost:3000/
 go run .
 ```
 
-### Frontend
+#### Frontend
 
 **Required: yarn or npm**
 
