@@ -13,7 +13,7 @@ Backend is in Go and uses Echo. Frontend is in React and uses Material-UI.
 
 # TODO
 
-* PUT
+* Add members
 * Transaction details
 * Save URL for previously created pognon
 * Currencies
