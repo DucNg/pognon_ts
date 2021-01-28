@@ -20,9 +20,13 @@ interface item {
 
 function SelectPersons({type, participants, transaction, setTransaction, error, setError}: Props) {
     const [amounts, setAmounts] = useState({
-        Buyers: transaction.Buyers.map(purchase => purchase.Amount.toFixed(2)),
-        For: transaction.For.map(purchase => purchase.Amount.toFixed(2)),
-    })
+        Buyers: transaction.Buyers.map(purchase => purchase.Amount
+            ? purchase.Amount.toFixed(2)
+            : ""),
+        For: transaction.For.map(purchase => purchase.Amount
+            ? purchase.Amount.toFixed(2)
+            : "")
+    });
 
     const handleChangeItems = (index: number, event: React.ChangeEvent<{name?: string; value: unknown;}>) => {
         const newSelection = event.target.value as number;
